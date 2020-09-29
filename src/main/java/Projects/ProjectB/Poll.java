@@ -1,6 +1,7 @@
 package Projects.ProjectB;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,10 +10,9 @@ public class Poll {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private int timeLimit; // This will be changed to a Data format in a later version
+    private ZonedDateTime timeLimit; // The target time for when the poll should close.
     private Boolean isPublic;
     private Boolean isActive;
-    //private ZonedDateTime activatedDateTime;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Vote vote;
@@ -27,7 +27,7 @@ public class Poll {
 
     }
 
-    public Poll(int timeLimit, Boolean isPublic, Boolean isActive, User creator, Vote vote) {
+    public Poll(ZonedDateTime timeLimit, Boolean isPublic, Boolean isActive, User creator, Vote vote) {
         this.timeLimit = timeLimit;
         this.isPublic = isPublic;
         this.isActive = isActive;
@@ -44,11 +44,11 @@ public class Poll {
         this.id = id;
     }
 
-    public int getTimeLimit() {
+    public ZonedDateTime getTimeLimit() {
         return timeLimit;
     }
 
-    public void setTimeLimit(int timeLimit) {
+    public void setTimeLimit(ZonedDateTime timeLimit) {
         this.timeLimit = timeLimit;
     }
 
