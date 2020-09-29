@@ -14,11 +14,12 @@ public class Controller {
 
 @Autowired
 private UserRepository userRepository;
+private PollRepostiroy pollRepository;
 
     @PostMapping("/register")
     public String registerUser(@RequestBody User user) {
         userRepository.save(user);
-        return "saved";
+        return "User saved";
     }
 
 	@GetMapping("/getUsers")
@@ -28,25 +29,9 @@ private UserRepository userRepository;
 	}
 
     @PostMapping("/createPoll")
-	public Poll createPoll(@RequestParam int timeLimit,
-						   @RequestParam Boolean isPublic,
-						   @RequestParam Boolean isActive,
-						   @RequestParam User creator,
-						   @RequestParam Vote vote) { // Vote ?
-
-    	return new Poll(timeLimit, isPublic, isActive, creator, vote);
+	public String createPoll(@RequestBody Poll poll) {
+		pollRepository.save(poll);
+		return "User saved";
 	}
 
-	@PostMapping("/vote")
-	public Vote createVote(@RequestBody Vote vote) {
-    	return vote;
-	}
-
-
-
-
-//	@GetMapping("/greeting")
-//	public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
-//		return new Greeting(counter.incrementAndGet(), String.format(template, name));
-//	}
 }
