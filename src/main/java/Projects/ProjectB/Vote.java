@@ -10,22 +10,12 @@ public class Vote {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private String question;
-    private String alternative1;
-    private String alternative2;
-    private int response1;
-    private int response2;
+    private int alternative1;
+    private int alternative2;
 
     public Vote() {
-
-    }
-
-    public Vote(String question, String alternative1, String alternative2) {
-        this.question = question;
-        this.alternative1 = alternative1;
-        this.alternative2 = alternative2;
-        this.response1 = 0;
-        this.response2 = 0;
+        this.alternative1 = 0;
+        this.alternative2 = 0;
     }
 
     public long getId() {
@@ -36,43 +26,27 @@ public class Vote {
         this.id = id;
     }
 
-    public String getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-    public String getAlternative1() {
+    public int getAlternative1() {
         return alternative1;
     }
 
-    public void setAlternative1(String alternative1) {
+    public void setAlternative1(int alternative1) {
         this.alternative1 = alternative1;
     }
 
-    public String getAlternative2() {
+    public int getAlternative2() {
         return alternative2;
     }
 
-    public void setAlternative2(String alternative2) {
+    public void setAlternative2(int alternative2) {
         this.alternative2 = alternative2;
     }
 
-    public int getResponse1() {
-        return response1;
-    }
-
-    public void setResponse1(int response1) {
-        this.response1 = response1;
-    }
-
-    public int getResponse2() {
-        return response2;
-    }
-
-    public void setResponse2(int response2) {
-        this.response2 = response2;
+    @Override
+    public String toString() {
+        return String.format(
+                "Vote[Id='%d', Red='%d', Green='%d']",
+                id, alternative1, alternative2
+        );
     }
 }

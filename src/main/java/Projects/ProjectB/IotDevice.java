@@ -30,4 +30,11 @@ public class IotDevice {
     public void setPoll(Poll poll) {
         this.poll = poll;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "IoT Device[Id='%d']", id
+        );
+    }
 }

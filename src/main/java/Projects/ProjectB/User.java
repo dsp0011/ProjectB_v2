@@ -85,10 +85,11 @@ public class User {
         this.pollsCreated = pollsCreated;
     }
 
-	@Override
-	public String toString() {
-		return String.format(
-				"User[userName=%s, password='%s', firstName='%s', lastName='%s']",
-				userName, password, firstName, lastName);
-	}
+    @Override
+    public String toString() {
+        return String.format(
+                "User[userName='%s', password='%s', firstName='%s', lastName='%s']",
+                userName, password, firstName, lastName
+        );
+    }
 }
