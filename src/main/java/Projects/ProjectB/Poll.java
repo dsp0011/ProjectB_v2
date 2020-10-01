@@ -1,5 +1,9 @@
 package Projects.ProjectB;
 
+import Projects.ProjectB.time.ITimeDuration;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.LoggerFactory;
+
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -13,7 +17,8 @@ public class Poll {
     private String question;
     private String alternative1;
     private String alternative2;
-    private ZonedDateTime timeLimit; // The target time for when the poll should close.
+    private String timeLimit; // The duration for how long the poll should remain active.
+    private String pollClosingDate; // The target time for when the poll should close.
     private Boolean isPublic;
     private Boolean isActive;
 
@@ -30,11 +35,15 @@ public class Poll {
 
     }
 
-    public Poll(String question, String alternative1, String alternative2, ZonedDateTime timeLimit, Boolean isPublic, Boolean isActive, User creator) {
+    public Poll(String question, String alternative1, String alternative2,
+                String timeLimit, Boolean isPublic, Boolean isActive, User creator) {
         this.question = question;
         this.alternative1 = alternative1;
         this.alternative2 = alternative2;
         this.timeLimit = timeLimit;
+        this.pollClosingDate = ITimeDuration.timeDurationFromStringOfTimeUnits(timeLimit)
+                .futureZonedDateTimeFromTimeDuration()
+                .toString();
         this.isPublic = isPublic;
         this.isActive = isActive;
         this.creator = creator;
@@ -74,12 +83,20 @@ public class Poll {
         this.alternative2 = alternative2;
     }
 
-    public ZonedDateTime getTimeLimit() {
+    public String getTimeLimit() {
         return timeLimit;
     }
 
-    public void setTimeLimit(ZonedDateTime timeLimit) {
+    public void setTimeLimit(String timeLimit) {
         this.timeLimit = timeLimit;
+    }
+
+    public String getPollClosingDate() {
+        return this.pollClosingDate;
+    }
+
+    public void setPollClosingDate(String pollClosingDate) {
+        this.pollClosingDate = pollClosingDate;
     }
 
     public Boolean getPublic() {
@@ -124,9 +141,21 @@ public class Poll {
 
     @Override
     public String toString() {
+        System.out.println("pollClosingDate = " + this.getPollClosingDate().toString());
         return String.format(
-                "Poll[Id='%d', Question 1='%s', Alternative 1='%s', Alternative 2='%s', Public='%s', Active='%s', Time Limit='%s', Creator='%s', Vote='%s']",
-                id, question, alternative1, alternative2, isPublic, isActive, timeLimit, creator, vote
+                "Poll[Id='%d', " +
+                        "Question 1='%s', " +
+                        "Alternative 1='%s', " +
+                        "Alternative 2='%s', " +
+                        "Public='%s', " +
+                        "Active='%s', " +
+                        "Time Limit='%s', " +
+                        "Poll Closing Date='%s', " +
+                        "Creator='%s', " +
+                        "Vote='%s']",
+                id, question, alternative1, alternative2,
+                isPublic, isActive, timeLimit,
+                pollClosingDate, creator, vote
         );
     }
 }
