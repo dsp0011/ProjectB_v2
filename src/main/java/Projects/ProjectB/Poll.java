@@ -141,7 +141,6 @@ public class Poll {
 
     @Override
     public String toString() {
-        System.out.println("pollClosingDate = " + this.getPollClosingDate().toString());
         return String.format(
                 "Poll[Id='%d', " +
                         "Question 1='%s', " +
