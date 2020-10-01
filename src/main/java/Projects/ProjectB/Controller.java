@@ -1,5 +1,7 @@
 package Projects.ProjectB;
 
+import Projects.ProjectB.time.ITimeDuration;
+import Projects.ProjectB.time.TimeDuration;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +87,8 @@ private IoTDeviceRepository ioTDeviceRepository;
 	@PutMapping("/polls/{id}")
 	public @ResponseBody Poll updatePoll(@PathVariable long id, @RequestBody Poll poll) {
 		Poll oldPoll = pollRepository.findById(id);
+		boolean wasActive = oldPoll.getActive();
+		boolean isActive = poll.getActive();
 		oldPoll.setQuestion(poll.getQuestion());
 		oldPoll.setAlternative1(poll.getAlternative1());
 		oldPoll.setAlternative2(poll.getAlternative2());
@@ -92,6 +96,15 @@ private IoTDeviceRepository ioTDeviceRepository;
 		oldPoll.setActive(poll.getActive());
 		oldPoll.setCreator(poll.getCreator());
 		oldPoll.setTimeLimit(poll.getTimeLimit());
+		if (wasActive && !isActive) { // If poll closes, do not update closing date.
+			oldPoll.setPollClosingDate(oldPoll.getPollClosingDate());
+		} else {
+			String newPollClosingDate = ITimeDuration
+					.timeDurationFromStringOfTimeUnits(oldPoll.getTimeLimit())
+					.futureZonedDateTimeFromTimeDuration()
+					.toString();
+			oldPoll.setPollClosingDate(newPollClosingDate);
+		}
 		oldPoll.setVote(poll.getVote());
 		oldPoll.setIotDevices(poll.getIotDevices());
 
