@@ -1,11 +1,11 @@
 ----------------------------------------------------------------
-Thu Oct 01 10:19:44 CEST 2020:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0174-e33e-e517-000002673de0 
-on database directory C:\Users\Asus\Documents\UNI\Master\DAT250\project\ProjectB\db with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@4e0e2f2a 
-Loaded from file:/C:/Users/Asus/.m2/repository/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar
+Thu Oct 01 11:56:23 CEST 2020:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0174-e397-5f0e-0000023649f0 
+on database directory C:\Users\tore4\IdeaProjects\DAT250_Projects\ProjectB_v2\db with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@2626b418 
+Loaded from file:/C:/Users/tore4/.m2/repository/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar
 java.vendor=Oracle Corporation
 java.runtime.version=14.0.2+12-46
-user.dir=C:\Users\Asus\Documents\UNI\Master\DAT250\project\ProjectB
+user.dir=C:\Users\tore4\IdeaProjects\DAT250_Projects\ProjectB_v2
 os.name=Windows 10
 os.arch=amd64
 os.version=10.0
