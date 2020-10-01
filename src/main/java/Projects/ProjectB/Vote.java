@@ -11,21 +11,21 @@ public class Vote {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String question;
-    private String alternativ1;
-    private String alternativ2;
-    private int respons1;
-    private int respons2;
+    private String alternative1;
+    private String alternative2;
+    private int response1;
+    private int response2;
 
     public Vote() {
 
     }
 
-    public Vote(String question, String alternativ1, String alternativ2) {
+    public Vote(String question, String alternative1, String alternative2) {
         this.question = question;
-        this.alternativ1 = alternativ1;
-        this.alternativ2 = alternativ2;
-        this.respons1 = 0;
-        this.respons2 = 0;
+        this.alternative1 = alternative1;
+        this.alternative2 = alternative2;
+        this.response1 = 0;
+        this.response2 = 0;
     }
 
     public long getId() {
@@ -44,35 +44,35 @@ public class Vote {
         this.question = question;
     }
 
-    public String getAlternativ1() {
-        return alternativ1;
+    public String getAlternative1() {
+        return alternative1;
     }
 
-    public void setAlternativ1(String alternativ1) {
-        this.alternativ1 = alternativ1;
+    public void setAlternative1(String alternative1) {
+        this.alternative1 = alternative1;
     }
 
-    public String getAlternativ2() {
-        return alternativ2;
+    public String getAlternative2() {
+        return alternative2;
     }
 
-    public void setAlternativ2(String alternativ2) {
-        this.alternativ2 = alternativ2;
+    public void setAlternative2(String alternative2) {
+        this.alternative2 = alternative2;
     }
 
-    public int getRespons1() {
-        return respons1;
+    public int getResponse1() {
+        return response1;
     }
 
-    public void setRespons1(int respons1) {
-        this.respons1 = respons1;
+    public void setResponse1(int response1) {
+        this.response1 = response1;
     }
 
-    public int getRespons2() {
-        return respons2;
+    public int getResponse2() {
+        return response2;
     }
 
-    public void setRespons2(int respons2) {
-        this.respons2 = respons2;
+    public void setResponse2(int response2) {
+        this.response2 = response2;
     }
 }
