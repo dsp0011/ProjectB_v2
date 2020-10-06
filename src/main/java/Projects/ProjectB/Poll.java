@@ -22,6 +22,10 @@ public class Poll {
     private Boolean isPublic;
     private Boolean isActive;
 
+
+
+    private Boolean canEdit; // Specify if the poll is still editable.
+
     @OneToOne(cascade = CascadeType.ALL)
     private Vote vote = new Vote();
 
@@ -36,7 +40,7 @@ public class Poll {
     }
 
     public Poll(String question, String alternative1, String alternative2,
-                String timeLimit, Boolean isPublic, Boolean isActive, User creator) {
+                String timeLimit, Boolean isPublic, Boolean isActive, Boolean canEdit, User creator) {
         this.question = question;
         this.alternative1 = alternative1;
         this.alternative2 = alternative2;
@@ -46,6 +50,7 @@ public class Poll {
                 .toString();
         this.isPublic = isPublic;
         this.isActive = isActive;
+        this.canEdit = canEdit;
         this.creator = creator;
         this.vote = new Vote();
         this.iotDevices = new ArrayList<>();
@@ -139,6 +144,14 @@ public class Poll {
         this.iotDevices = iotDevices;
     }
 
+    public Boolean getCanEdit() {
+        return canEdit;
+    }
+
+    public void setCanEdit(Boolean canEdit) {
+        this.canEdit = canEdit;
+    }
+
     @Override
     public String toString() {
         return String.format(
@@ -148,12 +161,13 @@ public class Poll {
                         "Alternative 2='%s', " +
                         "Public='%s', " +
                         "Active='%s', " +
+                        "Can edit poll='%s', " +
                         "Time Limit='%s', " +
                         "Poll Closing Date='%s', " +
                         "Creator='%s', " +
                         "Vote='%s']",
                 id, question, alternative1, alternative2,
-                isPublic, isActive, timeLimit,
+                isPublic, isActive, canEdit, timeLimit,
                 pollClosingDate, creator, vote
         );
     }
