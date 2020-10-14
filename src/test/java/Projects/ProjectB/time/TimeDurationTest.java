@@ -240,7 +240,7 @@ class TimeDurationTest {
         assertEquals(0, time5.getMinutes());
         assertEquals(0, time5.getSeconds());
     }
-    
+
     @Test
     void getDays() {
         assertEquals(DAYS, timeDuration.getDays());
@@ -261,54 +261,105 @@ class TimeDurationTest {
         assertEquals(SECONDS, timeDuration.getSeconds());
     }
 
-    /*
     @Test
     void setDays() {
+        assertEquals(DAYS, timeDuration.getDays());
+        int newValueForDays = DAYS + 1;
+        timeDuration.setDays(newValueForDays);
+        assertEquals(newValueForDays, timeDuration.getDays());
     }
 
     @Test
     void setHours() {
+        assertEquals(HOURS, timeDuration.getHours());
+        int newValueForHours = HOURS + 1;
+        timeDuration.setHours(newValueForHours);
+        assertEquals(newValueForHours, timeDuration.getHours());
     }
 
     @Test
     void setMinutes() {
+        assertEquals(MINUTES, timeDuration.getMinutes());
+        int newValueForMinutes = MINUTES + 1;
+        timeDuration.setMinutes(newValueForMinutes);
+        assertEquals(newValueForMinutes, timeDuration.getMinutes());
     }
 
     @Test
     void setSeconds() {
+        assertEquals(SECONDS, timeDuration.getSeconds());
+        int newValueForSeconds = SECONDS + 1;
+        timeDuration.setSeconds(newValueForSeconds);
+        assertEquals(newValueForSeconds, timeDuration.getSeconds());
     }
 
     @Test
-    void reduceDaysBy() {
+    void reduceDaysByOne() {
+        assertEquals(DAYS, timeDuration.getDays());
+        timeDuration.reduceDaysBy(1);
+        assertEquals(DAYS - 1, timeDuration.getDays());
     }
 
     @Test
-    void reduceHoursBy() {
+    void reduceHoursByOne() {
+        assertEquals(HOURS, timeDuration.getHours());
+        timeDuration.reduceHoursBy(1);
+        int reducedValue = 19; // Change this value if value for HOURS is changed.
+        assertEquals(reducedValue, timeDuration.getHours());
     }
 
     @Test
-    void reduceMinutesBy() {
+    void reduceMinutesByOne() {
+        assertEquals(MINUTES, timeDuration.getMinutes());
+        timeDuration.reduceMinutesBy(1);
+        int reducedValue = 59; // Change this value if value for MINUTES is changed.
+        assertEquals(reducedValue, timeDuration.getMinutes());
     }
 
     @Test
-    void reduceSecondsBy() {
+    void reduceSecondsByOne() {
+        assertEquals(SECONDS, timeDuration.getSeconds());
+        timeDuration.reduceSecondsBy(1);
+        int reducedValue = 25; // Change this value if value for SECONDS is changed.
+        assertEquals(reducedValue, timeDuration.getSeconds());
     }
 
     @Test
     void increaseDaysBy() {
+        assertEquals(DAYS, timeDuration.getDays());
+        timeDuration.increaseDaysBy(1);
+        assertEquals(DAYS + 1, timeDuration.getDays());
     }
 
     @Test
     void increaseHoursBy() {
+        assertEquals(HOURS, timeDuration.getHours());
+        timeDuration.increaseHoursBy(1);
+        int increasedValue = 21; // Change this value if value for HOURS is changed.
+        assertEquals(increasedValue, timeDuration.getHours());
     }
 
     @Test
     void increaseMinutesBy() {
+        assertEquals(MINUTES, timeDuration.getMinutes());
+        timeDuration.increaseMinutesBy(1);
+        int increasedValue = 1; // Change this value if value for MINUTES is changed.
+        assertEquals(increasedValue, timeDuration.getMinutes());
+
     }
 
     @Test
     void increaseSecondsBy() {
+        assertEquals(SECONDS, timeDuration.getSeconds());
+        timeDuration.increaseSecondsBy(1);
+        int increasedValue = 27; // Change this value if value for SECONDS is changed.
+        assertEquals(increasedValue, timeDuration.getSeconds());
     }
+
+
+
+
+/*
 
     @Test
     void printTimeDuration() {
