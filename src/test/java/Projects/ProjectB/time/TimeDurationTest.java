@@ -21,8 +21,47 @@ class TimeDurationTest {
     }
 
     @Test
-    void secondsToTimeUnits() {
+    void oneSecondToTimeUnitsHasTheRightTimeUnits() {
+        ITimeDuration time = new TimeDuration(ONE_SECOND);
+        assertEquals(0, time.getDays());
+        assertEquals(0, time.getHours());
+        assertEquals(0, time.getMinutes());
+        assertEquals(1, time.getSeconds());
+        String correctTimeUnits = "Days: 0, Hours: 0, Minutes: 0, Seconds: 1";
+        assertEquals(correctTimeUnits, time.toString());
+    }
 
+    @Test
+    void oneMinuteToTimeUnitsHasTheRightTimeUnits() {
+        ITimeDuration time = new TimeDuration(ONE_MINUTE);
+        assertEquals(0, time.getDays());
+        assertEquals(0, time.getHours());
+        assertEquals(1, time.getMinutes());
+        assertEquals(0, time.getSeconds());
+        String correctTimeUnits = "Days: 0, Hours: 0, Minutes: 1, Seconds: 0";
+        assertEquals(correctTimeUnits, time.toString());
+    }
+
+    @Test
+    void oneHourToTimeUnitsHasTheRightTimeUnits() {
+        ITimeDuration time = new TimeDuration(ONE_HOUR);
+        assertEquals(0, time.getDays());
+        assertEquals(1, time.getHours());
+        assertEquals(0, time.getMinutes());
+        assertEquals(0, time.getSeconds());
+        String correctTimeUnits = "Days: 0, Hours: 1, Minutes: 0, Seconds: 0";
+        assertEquals(correctTimeUnits, time.toString());
+    }
+
+    @Test
+    void oneDayToTimeUnitsHasTheRightTimeUnits() {
+        ITimeDuration time = new TimeDuration(ONE_DAY);
+        assertEquals(1, time.getDays());
+        assertEquals(0, time.getHours());
+        assertEquals(0, time.getMinutes());
+        assertEquals(0, time.getSeconds());
+        String correctTimeUnits = "Days: 1, Hours: 0, Minutes: 0, Seconds: 0";
+        assertEquals(correctTimeUnits, time.toString());
     }
 
     @Test
