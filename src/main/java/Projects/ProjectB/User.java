@@ -9,6 +9,8 @@ import java.util.List;
 @Table(name = "pollUser")
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
     private String userName;
     private String password;
     private String firstName;
@@ -35,6 +37,14 @@ public class User {
 
     public void createPoll(Poll poll) {
         this.pollsCreated.add(poll);
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getUserName() {
@@ -88,8 +98,12 @@ public class User {
     @Override
     public String toString() {
         return String.format(
-                "User[userName='%s', password='%s', firstName='%s', lastName='%s']",
-                userName, password, firstName, lastName
+                "User[Id='%d', " +
+                        "userName='%s', " +
+                        "password='%s', " +
+                        "firstName='%s', " +
+                        "lastName='%s']",
+                id, userName, password, firstName, lastName
         );
     }
 }
