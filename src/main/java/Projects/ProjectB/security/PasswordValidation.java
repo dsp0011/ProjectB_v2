@@ -1,20 +1,45 @@
 package Projects.ProjectB.security;
 
+import lombok.NonNull;
 import org.passay.*;
+import org.passay.dictionary.WordListDictionary;
+import org.passay.dictionary.WordLists;
+import org.passay.dictionary.sort.ArraysSort;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 public class PasswordValidation {
 
-    private static final PasswordValidator passwordValidator = createPasswordValidator();
+    private static PasswordValidator validator;
 
-    private static PasswordValidator createPasswordValidator() {
+    static {
+        try {
+            validator = createPasswordValidator();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Constructs a password validator.
+     *
+     * @return The password validator.
+     */
+    private static PasswordValidator createPasswordValidator() throws IOException {
+        String filePath = "src/main/resources/Top_10_000_CommonlyUsedPasswords.txt";
+        DictionaryRule dictionaryRule = new DictionaryRule(
+                new WordListDictionary(WordLists.createFromReader(
+                        new FileReader[] {new FileReader(filePath)},
+                        false, new ArraysSort())));
+
         return new PasswordValidator(Arrays.asList(
                 // A valid password must fulfill the following rules:
 
-                // Be between 8 and 25 symbols long.
-                new LengthRule(8, 25),
+                // Be between 8 and 64? symbols long.
+                new LengthRule(8, 64),
 
                 // Contain at least one uppercase letter
                 new CharacterRule(EnglishCharacterData.UpperCase, 1),
@@ -38,46 +63,41 @@ public class PasswordValidation {
                 new IllegalSequenceRule(EnglishSequenceData.USQwerty, 5, false),
 
                 // Not be the same as the username.
-                new UsernameRule()
+                new UsernameRule(),
+
+                // Not be one of the 10.000 most commonly used passwords
+                dictionaryRule
         ));
     }
 
-
-
-
-    public static boolean validatePassword(String suggestedPassword,
-                                           String repeatedPassword,
-                                           String suggestedUsername) {
-        if (suggestedPassword == null || repeatedPassword == null || suggestedUsername == null) {
-            System.out.println("Input can't be null");
-            return false;
-        }
-
-        RuleResult result = passwordValidator.validate(new PasswordData(suggestedUsername, suggestedPassword));
-        if (!result.isValid()) {
-            System.out.println("Password is not valid");
-            printRuleViolations(result);
-            return false;
-        }
-
-        if (suggestedPassword.equals(repeatedPassword)) {
-            System.out.println("suggested and repeat are equal");
-            return true;
-        } else {
-            System.out.println("Password and repeated password did not match");
-            return false;
-        }
+    /**
+     * Checks if the given password is valid according to the defined rules.
+     *
+     * @param password The password the user wants to register.
+     * @param username The username of the user trying to register the password.
+     * @return The result of the password validation.
+     */
+    public static RuleResult validatePassword(@NonNull String password,
+                                              @NonNull String username) {
+        return validator.validate(new PasswordData(username, password));
     }
 
     /**
-     * Print the rule violations that resulted in the password not being deemed valid.
+     * Get the rule violations that resulted in the password not being deemed valid.
      *
      * @param result The result of a password validation check.
+     * @return The broken rules.
      */
-    private static void printRuleViolations(RuleResult result) {
-        List<String> messages = passwordValidator.getMessages(result);
+    public static String getRuleViolations(@NonNull RuleResult result) {
+        List<String> messages = validator.getMessages(result);
+        StringBuilder builder = new StringBuilder();
         for (String message : messages) {
-            System.out.println("message = " + message);
+            builder.append(message).append("\n");
         }
+        // Remove the last new line
+        if (builder.length() > 0) {
+            builder.deleteCharAt(builder.length() - 1);
+        }
+        return builder.toString();
     }
 }
