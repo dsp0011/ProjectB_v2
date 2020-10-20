@@ -1,13 +1,14 @@
 package Projects.ProjectB;
 
+import Projects.ProjectB.security.PasswordValidation;
 import Projects.ProjectB.time.ITimeDuration;
-import Projects.ProjectB.time.TimeDuration;
+import org.passay.RuleResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.Map;
 
 @RestController
 public class Controller {
@@ -21,14 +22,53 @@ private PollRepository pollRepository;
 @Autowired
 private IoTDeviceRepository ioTDeviceRepository;
 
+private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.class);
 
 /*
 			USER REQUESTS
  */
     @PostMapping("/users")
-    public String createUser(@RequestBody User user) {
-        userRepository.save(user);
-        return "User saved";
+    public String createUser(@RequestBody Map<String, String> json) {
+    	String userName = "" + json.get("userName");
+    	String password = "" + json.get("password");
+    	String repeatPassword = "" + json.get("repeatPassword");
+    	String firstName = "" + json.get("firstName");
+    	String lastName = "" + json.get("lastName");
+    	User user = new User(userName, password, firstName, lastName);
+
+    	log.info("Attempting to create a new user");
+		System.out.println("password = " + password);
+		System.out.println("repeatPassword = " + repeatPassword);
+		System.out.println("userName = " + userName);
+
+        return evaluateUserCredentials(user, password, repeatPassword);
+    }
+
+    private String evaluateUserCredentials(User user, String password, String repeatPassword) {
+        String userName = user.getUserName();
+        if (userRepository.findByUserName(userName) != null) {
+            log.info("Username is already taken");
+            return "User was not saved\n" +
+                    "Username is already taken";
+        }
+
+        RuleResult result = PasswordValidation.validatePassword(password, userName);
+        if (!result.isValid()) {
+            log.info("Password was not valid");
+            return "User was not saved\n" +
+                    PasswordValidation.getRuleViolations(result);
+        }
+
+        if (password.equals(repeatPassword)) {
+            // TODO: Password should be hashed with salt in User class.
+            userRepository.save(user);
+            log.info("Saved user with valid password");
+            return "User saved";
+        } else {
+            log.info("Password and repeated password did not match");
+            return "User was not saved\n" +
+                    "Password and repeated password did not match";
+        }
     }
 
 	@GetMapping("/users")
