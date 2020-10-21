@@ -45,6 +45,7 @@ private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.cl
     }
 
     private String evaluateUserCredentials(User user, String password, String repeatPassword) {
+    	log.info("Evaluating user credentials");
         String userName = user.getUserName();
         if (userRepository.findByUserName(userName) != null) {
             log.info("Username is already taken");
@@ -73,18 +74,21 @@ private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.cl
 
 	@GetMapping("/users")
 	public @ResponseBody Iterable<User> getAllUsers() {
+    	log.info("Getting all users");
 		// This returns a JSON or XML with the users
 		return userRepository.findAll();
 	}
 
 	@GetMapping("/users/{userName}")
 	public @ResponseBody User getUser(@PathVariable String userName) {
+    	log.info("Getting specific user");
 		// This returns a JSON or XML with the users
 		return userRepository.findByUserName(userName);
 	}
 
 	@PutMapping("/users/{userName}")
 	public @ResponseBody User updateUser(@PathVariable String userName, @RequestBody User user) {
+    	log.info("Attempting to alter existing user");
 		User oldUser = userRepository.findByUserName(userName);
 		oldUser.setFirstName(user.getFirstName());
 		oldUser.setLastName(user.getLastName());
@@ -97,6 +101,7 @@ private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.cl
 
 	@DeleteMapping("/users/{userName}")
 	public String deleteUser(@PathVariable String userName) {
+    	log.info("Attempting to delete a user");
 		userRepository.delete(userRepository.findByUserName(userName));
 		return "User deleted";
 	}
@@ -108,24 +113,28 @@ private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.cl
 
     @PostMapping("/polls")
 	public String createPoll(@RequestBody Poll poll) {
+    	log.info("Creating a new poll");
 		pollRepository.save(poll);
 		return "Poll saved";
 	}
 
 	@GetMapping("/polls")
 	public @ResponseBody Iterable<Poll> getAllPolls() {
+    	log.info("Getting all polls");
 		// This returns a JSON or XML with the users
 		return pollRepository.findAll();
 	}
 
 	@GetMapping("/polls/{id}")
 	public @ResponseBody Poll getPoll(@PathVariable long id) {
+    	log.info("Attempting to get existing poll");
 		// This returns a JSON or XML with the users
 		return pollRepository.findById(id);
 	}
 
 	@PutMapping("/polls/{id}")
 	public @ResponseBody Poll updatePoll(@PathVariable long id, @RequestBody Poll poll) {
+    	log.info("Attempting to alter existing poll");
 		Poll oldPoll = pollRepository.findById(id);
 		boolean wasActive = oldPoll.getActive();
 		boolean isActive = poll.getActive();
@@ -153,6 +162,7 @@ private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.cl
 
 	@DeleteMapping("/polls/{id}")
 	public String deletePoll(@PathVariable long id) {
+    	log.info("Attempting to delete a poll");
 		pollRepository.delete(pollRepository.findById(id));
 		return "Poll deleted";
 	}
@@ -163,24 +173,28 @@ private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.cl
 
 	@PostMapping("/devices")
 	public String createDevice(@RequestBody IotDevice iotDevice) {
+		log.info("Creating a new IoT device");
 		ioTDeviceRepository.save(iotDevice);
 		return "Device saved";
 	}
 
 	@GetMapping("/devices")
 	public @ResponseBody Iterable<IotDevice> getAllDevices() {
+		log.info("Getting all IoT devices");
 		// This returns a JSON or XML with the devices
 		return ioTDeviceRepository.findAll();
 	}
 
 	@GetMapping("/devices/{id}")
 	public @ResponseBody IotDevice getDevice(@PathVariable long id) {
+		log.info("Attempting to get existing IoT device");
 		// This returns a JSON or XML with the devices
 		return ioTDeviceRepository.findById(id);
 	}
 
 	@PutMapping("/devices/{id}")
 	public @ResponseBody IotDevice updatePoll(@PathVariable long id, @RequestBody IotDevice iotDevice) {
+		log.info("Attempting to attach an IoT device to an existing poll");
 		IotDevice oldDevice = ioTDeviceRepository.findById(id);
 		oldDevice.setPoll(iotDevice.getPoll());
 
@@ -189,6 +203,7 @@ private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.cl
 
 	@DeleteMapping("/devices/{id}")
 	public String deleteDevice(@PathVariable long id) {
+		log.info("Attempting to delete an existing IoT device");
 		ioTDeviceRepository.delete(ioTDeviceRepository.findById(id));
 		return "Device deleted";
 	}
@@ -199,6 +214,7 @@ private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.cl
 
 	@PutMapping("/votes/{id}")
 	public @ResponseBody Poll updateVote(@PathVariable long id, @RequestBody Vote vote) {
+		log.info("Attempting to alter an existing polls vote");
 		Poll poll = pollRepository.findById(id);
 		Vote newVote = poll.getVote();
 		newVote.setAlternative1(newVote.getAlternative1() + vote.getAlternative1());
