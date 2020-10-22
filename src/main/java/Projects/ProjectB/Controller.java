@@ -13,16 +13,20 @@ import java.util.Map;
 @RestController
 public class Controller {
 
-@Autowired
-private UserRepository userRepository;
+	private static final Logger log = LoggerFactory.getLogger(Controller.class);
+	private final AdminTools adminTools = new AdminTools();
+	final UserRepository userRepository;
+	final PollRepository pollRepository;
+	final IoTDeviceRepository ioTDeviceRepository;
 
-@Autowired
-private PollRepository pollRepository;
-
-@Autowired
-private IoTDeviceRepository ioTDeviceRepository;
-
-private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.class);
+	@Autowired
+	public Controller(UserRepository userRepository,
+					  PollRepository pollRepository,
+					  IoTDeviceRepository ioTDeviceRepository) {
+		this.userRepository = userRepository;
+		this.pollRepository = pollRepository;
+		this.ioTDeviceRepository = ioTDeviceRepository;
+	}
 
 /*
 			USER REQUESTS
