@@ -1,11 +1,41 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect, useState, useContext } from "react";
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { Typography } from '@material-ui/core';
+import { SessionContext, getSessionCookie, setSessionCookie, updateSessionCookie } from "./Session.js";
+
 
 class Login extends Component {
+    static context = SessionContext;
 
+    updateSessionUsername = (username) => {
+        console.log("username: ", username)
+    }
+ 
+
+    componentDidMount() {
+
+        const wow = 
+            {
+              anchor: "right",
+              direction: "column",
+            }
+        setSessionCookie(wow)
+        console.log("woooow", getSessionCookie())
+        updateSessionCookie("anchor", "noooooooooooooooooooo")
+        console.log("woooow2", getSessionCookie())
+
+    }
+
+    handleLogin = () => {
+        this.matchUser()
+    }
+    // Cgecj
+
+    checkCredentials = (username) => {
+
+    }
     render() {
         return (
             <div>
@@ -57,7 +87,8 @@ class Login extends Component {
                         variant="filled" 
                         inputProps={{style: { textAlign: 'left', fontSize: 30}}}
                         InputLabelProps={{style: {textAlign: 'center', fontSize: 30}}}
-                        onChange = {e => {this.setState({ pollID: e.target.value});}}
+                        
+                        onChange = {e => {this.updateSessionUsername(e.target.value)}}
                         style = {{ top:"17vh",
                                     position:"relative",
                                     left: "20%",
