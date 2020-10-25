@@ -21,7 +21,7 @@ public class PasswordRandomizer {
         public String getCharacters() {
             return EnglishCharacterData.Alphabetical.getCharacters() +
                     EnglishCharacterData.Digit.getCharacters() +
-                    "?!#&@_";
+                    "?!_+-=";
         }
     }, 1);
 
@@ -35,18 +35,14 @@ public class PasswordRandomizer {
     // can generate new passwords for all users.
     public static void randomiseAllUserPasswords(UserRepository userRepository) {
         log.info("Randomizing all user passwords");
-        PasswordValidator validator = new PasswordValidator();
         for (User user : userRepository.findAll()) {
-            System.out.println("old = " + user.getPassword());
             user.setPassword(generateNewPassword());
-            System.out.println("new = " + user.getPassword());
             userRepository.save(user);
         }
     }
 
     public static String generateNewPassword() {
         log.info("Generating a new password");
-        System.out.println(PASSWORD_GENERATION_RULE.getValidCharacters());
         return generator.generatePassword(PasswordValidation.MAX_PASSWORD_LENGTH, PASSWORD_GENERATION_RULE);
     }
 }
