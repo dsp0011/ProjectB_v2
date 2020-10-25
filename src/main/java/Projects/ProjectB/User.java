@@ -14,16 +14,18 @@ public class User {
 
     @Column(unique = true)
     private String userName;
-    
+
     private String password;
     private String firstName;
     private String lastName;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Poll> pollsVotedOn;
+    //@OneToMany(cascade = CascadeType.ALL)
+    @ElementCollection
+    private List<Long> idsOfPollsVotedOn;
 
-    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
-    private List<Poll> pollsCreated;
+    //@OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
+    @ElementCollection
+    private List<Long> idsOfPollsCreated;
 
     public User() {
 
@@ -34,12 +36,16 @@ public class User {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.pollsVotedOn = new ArrayList<>();
-        this.pollsCreated = new ArrayList<>();
+        this.idsOfPollsVotedOn = new ArrayList<>();
+        this.idsOfPollsCreated = new ArrayList<>();
     }
 
-    public void createPoll(Poll poll) {
-        this.pollsCreated.add(poll);
+    public void createdANewPoll(Poll poll) {
+        this.idsOfPollsCreated.add(poll.getId());
+    }
+
+    public void votedOnANewPoll(Poll poll) {
+        this.idsOfPollsVotedOn.add(poll.getId());
     }
 
     public long getId() {
@@ -82,20 +88,20 @@ public class User {
         this.lastName = lastName;
     }
 
-    public List<Poll> getPollsVotedOn() {
-        return pollsVotedOn;
+    public List<Long> getPollsVotedOn() {
+        return idsOfPollsVotedOn;
     }
 
-    public void setPollsVotedOn(List<Poll> pollsVotedOn) {
-        this.pollsVotedOn = pollsVotedOn;
+    public void setPollsVotedOn(List<Long> idsOfPollsVotedOn) {
+        this.idsOfPollsVotedOn = idsOfPollsVotedOn;
     }
 
-    public List<Poll> getPollsCreated() {
-        return pollsCreated;
+    public List<Long> getPollsCreated() {
+        return idsOfPollsCreated;
     }
 
-    public void setPollsCreated(List<Poll> pollsCreated) {
-        this.pollsCreated = pollsCreated;
+    public void setPollsCreated(List<Long> idsOfPollsCreated) {
+        this.idsOfPollsCreated = idsOfPollsCreated;
     }
 
     @Override
