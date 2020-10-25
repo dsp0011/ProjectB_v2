@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 @RestController
@@ -42,16 +44,12 @@ public class Controller {
     	String repeatPassword = "" + json.get("repeatPassword");
     	String firstName = "" + json.get("firstName");
     	String lastName = "" + json.get("lastName");
+		Instant start = Instant.now();
     	User user = new User(userName, password, firstName, lastName);
-
-
-		System.out.println("password = " + password);
-		System.out.println("repeatPassword = " + repeatPassword);
-		System.out.println("userName = " + userName);
-
-		//adminTools.resetAllUserPasswords();
-
-        return evaluateUserCredentials(user, password, repeatPassword);
+		Instant end = Instant.now();
+		log.info("Hashing the users password took roughly " +
+				ChronoUnit.MILLIS.between(start, end) + " ms");
+    	return evaluateUserCredentials(user, password, repeatPassword);
     }
 
     private String evaluateUserCredentials(User user, String password, String repeatPassword) {
@@ -71,7 +69,6 @@ public class Controller {
         }
 
         if (password.equals(repeatPassword)) {
-            // TODO: Password should be hashed with salt in User class.
             userRepository.save(user);
             log.info("Saved user with valid password");
             return "User saved";
