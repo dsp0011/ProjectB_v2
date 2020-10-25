@@ -23,10 +23,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         // Permit the following CRUD operations on the specified endpoints.
         // TODO: Should be restricted before production.
-        web.ignoring().antMatchers(HttpMethod.POST, "/users", "/polls", "/devices");
-        web.ignoring().antMatchers(HttpMethod.PUT, "/users", "/devices", "/polls");
-        web.ignoring().antMatchers(HttpMethod.DELETE, "/users", "/devices", "/polls");
-        web.ignoring().antMatchers(HttpMethod.GET, "/users", "/devices", "/polls");
+        web.ignoring().antMatchers(HttpMethod.POST, "/**");
+        web.ignoring().antMatchers(HttpMethod.PUT, "/**");
+        web.ignoring().antMatchers(HttpMethod.DELETE, "/**");
+        web.ignoring().antMatchers(HttpMethod.GET, "/**");
     }
 
     @Override
