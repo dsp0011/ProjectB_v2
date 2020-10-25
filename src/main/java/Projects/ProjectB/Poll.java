@@ -92,7 +92,14 @@ public class Poll {
     }
 
     public void setTimeLimit(String timeLimit) {
-        this.timeLimit = timeLimit;
+        System.out.println("trying to set time limit");
+        if (timeLimit == null || timeLimit.isEmpty()) {
+            this.timeLimit = "inf";
+            System.out.println("timelimit was inf");
+        } else {
+            this.timeLimit = timeLimit;
+            System.out.println("set the timelimit regular");
+        }
     }
 
     public String getPollClosingDate() {
