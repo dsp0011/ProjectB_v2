@@ -1,5 +1,6 @@
 package Projects.ProjectB;
 
+import Projects.ProjectB.security.PasswordRandomizer;
 import Projects.ProjectB.security.PasswordValidation;
 import Projects.ProjectB.time.ITimeDuration;
 import org.passay.RuleResult;
@@ -44,6 +45,8 @@ public class Controller {
 		System.out.println("password = " + password);
 		System.out.println("repeatPassword = " + repeatPassword);
 		System.out.println("userName = " + userName);
+
+		//adminTools.resetAllUserPasswords();
 
         return evaluateUserCredentials(user, password, repeatPassword);
     }
@@ -226,6 +229,17 @@ public class Controller {
 		poll.setVote(newVote);
 
 		return pollRepository.save(poll);
+	}
+
+
+	private class AdminTools {
+		public void resetUserPassword(User user) {
+			PasswordRandomizer.randomiseOneUsersPassword(userRepository, user);
+		}
+
+		public void resetAllUserPasswords() {
+			PasswordRandomizer.randomiseAllUserPasswords(userRepository);
+		}
 	}
 
 }
