@@ -107,7 +107,45 @@ public class Poll {
     }
 
     public void setPollClosingDate(String pollClosingDate) {
-        this.pollClosingDate = pollClosingDate;
+        System.out.println("pollClosingDate value = " + pollClosingDate);
+        System.out.println("canEdit = " + canEdit);
+        System.out.println("isActive = " + isActive);
+        if (pollClosingDate.equals("inf")) {
+            this.pollClosingDate = pollClosingDate;
+            System.out.println("pollClosingDate was inf");
+        } else if (canEdit && !isActive) {
+            System.out.println("setting poll closing date based on time limit: " + timeLimit);
+            this.pollClosingDate = ITimeDuration
+                    .timeDurationFromStringOfTimeUnits(this.timeLimit)
+                    .futureZonedDateTimeFromTimeDuration()
+                    .toString();
+        } else {
+            this.pollClosingDate = pollClosingDate;
+            System.out.println("none of the above");
+        }
+        System.out.println("set the closing date to: " + this.pollClosingDate);
+        /*
+        1. Poll does not exist.
+
+        2. Poll is created:
+           canEdit = true && isActive = false;
+           The poll can be edited, so the poll closing date should
+           be auto renewed based on timeLimit, unless no timeLimit
+           is specified (timeLimit = "inf").
+
+        3. Poll is finished (published to the masses) and can now be voted on:
+           canEdit = false && isActive = true;
+           Users can vote on the poll, and it is no longer possible
+           to make changes to the poll.
+           Poll closing date should have been updated when the poll was published,
+           and users should somehow see the time left until that date.
+           Poll closing date should no longer be changed.
+
+       4. Poll is closed:
+          canEdit = false && isActive = false;
+          Poll has ended, either because it reached pollClosingDate,
+          or the creator manually closed the poll.
+       */
     }
 
     public Boolean getPublic() {
