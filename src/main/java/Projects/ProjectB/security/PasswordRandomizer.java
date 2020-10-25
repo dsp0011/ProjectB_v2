@@ -1,41 +1,52 @@
 package Projects.ProjectB.security;
 
-import Projects.ProjectB.ProjectBApplication;
 import Projects.ProjectB.User;
 import Projects.ProjectB.UserRepository;
-import org.passay.CharacterRule;
-import org.passay.EnglishCharacterData;
-import org.passay.PasswordGenerator;
+import org.passay.CharacterData;
+import org.passay.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class PasswordRandomizer {
 
-    // If user information is compromised,
-    // generate new passwords for all users.
-    private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.class);
+    private static final Logger log = LoggerFactory.getLogger(PasswordRandomizer.class);
+    private static final PasswordGenerator generator = new PasswordGenerator();
+    private static final CharacterRule PASSWORD_GENERATION_RULE = new CharacterRule(new CharacterData() {
+        @Override
+        public String getErrorCode() {
+            return "INSUFFICIENT_REQUIRED_CHARACTERS";
+        }
 
+        @Override
+        public String getCharacters() {
+            return EnglishCharacterData.Alphabetical.getCharacters() +
+                    EnglishCharacterData.Digit.getCharacters() +
+                    "?!#&@_";
+        }
+    }, 1);
 
+    public static void randomiseOneUsersPassword(UserRepository userRepository, User user) {
+        log.info("Replacing user password with a generated one");
+        user.setPassword(generateNewPassword());
+        userRepository.save(user);
+    }
+
+    // If user information is compromised we
+    // can generate new passwords for all users.
     public static void randomiseAllUserPasswords(UserRepository userRepository) {
         log.info("Randomizing all user passwords");
+        PasswordValidator validator = new PasswordValidator();
         for (User user : userRepository.findAll()) {
+            System.out.println("old = " + user.getPassword());
             user.setPassword(generateNewPassword());
+            System.out.println("new = " + user.getPassword());
             userRepository.save(user);
         }
     }
 
     public static String generateNewPassword() {
         log.info("Generating a new password");
-        List<CharacterRule> rules = Arrays.asList(
-                new CharacterRule(EnglishCharacterData.LowerCase, 1),
-                new CharacterRule(EnglishCharacterData.UpperCase, 1),
-                new CharacterRule(EnglishCharacterData.Digit, 1),
-                new CharacterRule(EnglishCharacterData.Special, 1)
-        );
-        PasswordGenerator generator = new PasswordGenerator();
-        return generator.generatePassword(64, rules);
+        System.out.println(PASSWORD_GENERATION_RULE.getValidCharacters());
+        return generator.generatePassword(PasswordValidation.MAX_PASSWORD_LENGTH, PASSWORD_GENERATION_RULE);
     }
 }
