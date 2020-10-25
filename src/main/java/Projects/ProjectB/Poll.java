@@ -1,11 +1,8 @@
 package Projects.ProjectB;
 
 import Projects.ProjectB.time.ITimeDuration;
-import org.slf4j.ILoggerFactory;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +18,6 @@ public class Poll {
     private String pollClosingDate; // The target time for when the poll should close.
     private Boolean isPublic;
     private Boolean isActive;
-
-
-
     private Boolean canEdit; // Specify if the poll is still editable.
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -36,7 +30,6 @@ public class Poll {
     private List<IotDevice> iotDevices;
 
     public Poll() {
-
     }
 
     public Poll(String question, String alternative1, String alternative2,
@@ -45,9 +38,15 @@ public class Poll {
         this.alternative1 = alternative1;
         this.alternative2 = alternative2;
         this.timeLimit = timeLimit;
-        this.pollClosingDate = ITimeDuration.timeDurationFromStringOfTimeUnits(timeLimit)
-                .futureZonedDateTimeFromTimeDuration()
-                .toString();
+        if (timeLimit == null || timeLimit.isEmpty() || timeLimit.toLowerCase().equals("inf")) {
+            this.pollClosingDate = "inf";   // No time limitation
+        } else {
+            String closingDate = ITimeDuration.timeDurationFromStringOfTimeUnits(timeLimit)
+                    .futureZonedDateTimeFromTimeDuration()
+                    .toString();
+            System.out.println("closingDate = " + closingDate);
+            this.pollClosingDate = closingDate;
+        }
         this.isPublic = isPublic;
         this.isActive = isActive;
         this.canEdit = canEdit;
