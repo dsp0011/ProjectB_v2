@@ -5,6 +5,8 @@ import org.passay.*;
 import org.passay.dictionary.WordListDictionary;
 import org.passay.dictionary.WordLists;
 import org.passay.dictionary.sort.ArraysSort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,6 +15,9 @@ import java.util.List;
 
 public class PasswordValidation {
 
+    private static final Logger log = LoggerFactory.getLogger(PasswordValidation.class);
+    public static final int MIN_PASSWORD_LENGTH = 8;
+    public static final int MAX_PASSWORD_LENGTH = 64;
     private static PasswordValidator validator;
 
     static {
@@ -29,17 +34,18 @@ public class PasswordValidation {
      * @return The password validator.
      */
     private static PasswordValidator createPasswordValidator() throws IOException {
+        log.info("Creating password validator");
         String filePath = "src/main/resources/Top_10_000_CommonlyUsedPasswords.txt";
         DictionaryRule dictionaryRule = new DictionaryRule(
                 new WordListDictionary(WordLists.createFromReader(
-                        new FileReader[] {new FileReader(filePath)},
+                        new FileReader[]{new FileReader(filePath)},
                         false, new ArraysSort())));
 
         return new PasswordValidator(Arrays.asList(
                 // A valid password must fulfill the following rules:
 
-                // Be between 8 and 64? symbols long.
-                new LengthRule(8, 64),
+                // Be between MIN_PASSWORD_LENGTH and MAX_PASSWORD_LENGTH symbols long.
+                new LengthRule(MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH),
 
                 // Contain at least one uppercase letter
                 new CharacterRule(EnglishCharacterData.UpperCase, 1),
@@ -79,6 +85,7 @@ public class PasswordValidation {
      */
     public static RuleResult validatePassword(@NonNull String password,
                                               @NonNull String username) {
+        log.info("Validating password");
         return validator.validate(new PasswordData(username, password));
     }
 
@@ -89,6 +96,7 @@ public class PasswordValidation {
      * @return The broken rules.
      */
     public static String getRuleViolations(@NonNull RuleResult result) {
+        log.info("Getting rule violations for password validation result");
         List<String> messages = validator.getMessages(result);
         StringBuilder builder = new StringBuilder();
         for (String message : messages) {
@@ -99,5 +107,18 @@ public class PasswordValidation {
             builder.deleteCharAt(builder.length() - 1);
         }
         return builder.toString();
+    }
+
+    // Can possibly be used for password strength feedback
+    // to users during registration and when changing password.
+    /**
+     * Estimate a passwords entropy, based on the validation rules.
+     *
+     * @param password The password to test.
+     * @return An estimate of the given passwords entropy (password strength)
+     */
+    public static double getEntropyEstimate(String password) {
+        log.info("Estimating password entropy");
+        return validator.estimateEntropy(new PasswordData(password));
     }
 }
