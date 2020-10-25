@@ -34,6 +34,9 @@ public class Controller {
  */
     @PostMapping("/users")
     public String createUser(@RequestBody Map<String, String> json) {
+		log.info("Attempting to create a new user");
+		// Concatenating request parameters with an empty
+		// string to prevent null values.
     	String userName = "" + json.get("userName");
     	String password = "" + json.get("password");
     	String repeatPassword = "" + json.get("repeatPassword");
@@ -41,7 +44,7 @@ public class Controller {
     	String lastName = "" + json.get("lastName");
     	User user = new User(userName, password, firstName, lastName);
 
-    	log.info("Attempting to create a new user");
+
 		System.out.println("password = " + password);
 		System.out.println("repeatPassword = " + repeatPassword);
 		System.out.println("userName = " + userName);
@@ -119,10 +122,28 @@ public class Controller {
  */
 
     @PostMapping("/polls")
-	public String createPoll(@RequestBody Poll poll) {
-    	log.info("Creating a new poll");
-		pollRepository.save(poll);
-		return "Poll saved";
+	public String createPoll(@RequestBody Map<String, String> json) {
+    	log.info("Attempting to create a new poll");
+    	String question = "" + json.get("question");
+    	String alternative1 = "" + json.get("alternative1");
+    	String alternative2 = "" + json.get("alternative2");
+    	String timeLimit = "" + json.get("timeLimit");
+    	boolean isPublic = Boolean.parseBoolean("" + json.get("isPublic"));
+    	String creatorUserName = "" + json.get("creator");
+		User creator = userRepository.findByUserName(creatorUserName);
+		if (creator == null) {
+			log.info("Creator did not exist in the database");
+			return "Poll was not saved\n" +
+					"Creator does not exist";
+		} else {
+			Poll poll = new Poll(question, alternative1, alternative2,
+					timeLimit, isPublic, false, true, creator);
+			pollRepository.save(poll);
+			creator.createdANewPoll(poll);
+			userRepository.save(creator);
+			log.info("Poll was created successfully");
+			return "Poll saved";
+		}
 	}
 
 	@GetMapping("/polls")
