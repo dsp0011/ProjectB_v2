@@ -2,7 +2,6 @@ package Projects.ProjectB;
 
 import Projects.ProjectB.security.PasswordRandomizer;
 import Projects.ProjectB.security.PasswordValidation;
-import Projects.ProjectB.time.ITimeDuration;
 import org.passay.RuleResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,31 +157,31 @@ public class Controller {
 	}
 
 	@PutMapping("/polls/{id}")
-	public @ResponseBody Poll updatePoll(@PathVariable long id, @RequestBody Poll poll) {
-    	log.info("Attempting to alter existing poll");
+	public @ResponseBody
+	Poll updatePoll(@PathVariable long id, @RequestBody Map<String, String> json) {
+		log.info("Attempting to alter existing poll");
 		Poll oldPoll = pollRepository.findById(id);
-		boolean wasActive = oldPoll.getActive();
-		boolean isActive = poll.getActive();
-		oldPoll.setQuestion(poll.getQuestion());
-		oldPoll.setAlternative1(poll.getAlternative1());
-		oldPoll.setAlternative2(poll.getAlternative2());
-		oldPoll.setPublic(poll.getPublic());
-		oldPoll.setActive(poll.getActive());
-		oldPoll.setCreator(poll.getCreator());
-		oldPoll.setTimeLimit(poll.getTimeLimit());
-		if (wasActive && !isActive) { // If poll closes, do not update closing date.
-			oldPoll.setPollClosingDate(oldPoll.getPollClosingDate());
+		if (oldPoll == null) {
+			log.info("Poll did not exist in the database");
+			return null;
+		} else if (!oldPoll.getCanEdit()) {
+			log.info("Poll was already published and could not be altered");
+			return oldPoll;
 		} else {
-			String newPollClosingDate = ITimeDuration
-					.timeDurationFromStringOfTimeUnits(oldPoll.getTimeLimit())
-					.futureZonedDateTimeFromTimeDuration()
-					.toString();
-			oldPoll.setPollClosingDate(newPollClosingDate);
-		}
-		oldPoll.setVote(poll.getVote());
-		oldPoll.setIotDevices(poll.getIotDevices());
+			String question = "" + json.get("question");
+			String alternative1 = "" + json.get("alternative1");
+			String alternative2 = "" + json.get("alternative2");
+			String timeLimit = "" + json.get("timeLimit");
+			boolean isPublic = Boolean.parseBoolean("" + json.get("public"));
 
-		return pollRepository.save(oldPoll);
+			oldPoll.setQuestion(question);
+			oldPoll.setAlternative1(alternative1);
+			oldPoll.setAlternative2(alternative2);
+			oldPoll.setTimeLimit(timeLimit);
+			oldPoll.setPublic(isPublic);
+			log.info("Successfully updated the poll");
+			return pollRepository.save(oldPoll);
+		}
 	}
 
 	@DeleteMapping("/polls/{id}")
