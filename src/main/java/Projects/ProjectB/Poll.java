@@ -21,9 +21,6 @@ public class Poll {
     private Boolean canEdit; // Specify if the poll is still editable.
 
 
-
-    private Boolean canEdit; // Specify if the poll is still editable.
-
     @OneToOne(cascade = CascadeType.ALL)
     private Vote vote = new Vote();
 
@@ -41,23 +38,60 @@ public class Poll {
         this.question = question;
         this.alternative1 = alternative1;
         this.alternative2 = alternative2;
-        this.timeLimit = timeLimit;
-        if (timeLimit == null || timeLimit.isEmpty() || timeLimit.toLowerCase().equals("inf")) {
-            this.pollClosingDate = "inf";   // No time limitation
-        } else {
-            String closingDate = ITimeDuration.timeDurationFromStringOfTimeUnits(timeLimit)
-                    .futureZonedDateTimeFromTimeDuration()
-                    .toString();
-            System.out.println("closingDate = " + closingDate);
-            this.pollClosingDate = closingDate;
-        }
         this.isPublic = isPublic;
         this.isActive = isActive;
         this.canEdit = canEdit;
+        setTimeLimit(timeLimit);
         this.creator = creator;
         this.vote = new Vote();
         this.iotDevices = new ArrayList<>();
     }
+/*
+        1. Poll does not exist.
+
+        2. Poll is created:
+           canEdit = true && isActive = false;
+           The poll can be edited, so the poll closing date should
+           be auto renewed based on timeLimit, unless no timeLimit
+           is specified (timeLimit = "inf").
+
+        3. Poll is finished (published to the masses) and can now be voted on:
+           canEdit = false && isActive = true;
+           Users can vote on the poll, and it is no longer possible
+           to make changes to the poll.
+           Poll closing date should have been updated when the poll was published,
+           and users should somehow see the time left until that date.
+           Poll closing date should no longer be changed.
+
+       4. Poll is closed:
+          canEdit = false && isActive = false;
+          Poll has ended, either because it reached pollClosingDate,
+          or the creator manually closed the poll.
+*/
+    /**
+     * Mark the poll as published.
+     */
+    public void publishPoll() {
+        if (this.canEdit && !this.isActive) {
+            updatePollClosingDate();
+            this.canEdit = false;
+            this.isActive = true;
+        } else {
+            throw new IllegalStateException("Poll has already been published");
+        }
+    }
+
+    /**
+     * Mark an active poll as closed.
+     */
+    public void closePoll() {
+        if (this.isActive && !this.canEdit) {
+            this.isActive = false;
+        } else {
+            throw new IllegalStateException("Poll is not active and can therefore not be closed");
+        }
+    }
+
 
     public long getId() {
         return id;
@@ -96,13 +130,28 @@ public class Poll {
     }
 
     public void setTimeLimit(String timeLimit) {
-        System.out.println("trying to set time limit");
-        if (timeLimit == null || timeLimit.isEmpty()) {
+        if (timeLimit == null
+                || timeLimit.isEmpty()
+                || timeLimit.toLowerCase().equals("inf")) {
             this.timeLimit = "inf";
-            System.out.println("timelimit was inf");
         } else {
             this.timeLimit = timeLimit;
-            System.out.println("set the timelimit regular");
+        }
+        updatePollClosingDate();
+    }
+
+    private void updatePollClosingDate() {
+        if (this.canEdit) {
+            if (this.timeLimit == null
+                    || this.timeLimit.isEmpty()
+                    || this.timeLimit.toLowerCase().equals("inf")) {
+                this.pollClosingDate = "inf";   // No time limitation
+            } else {
+                this.pollClosingDate = ITimeDuration
+                        .timeDurationFromStringOfTimeUnits(this.timeLimit)
+                        .futureZonedDateTimeFromTimeDuration()
+                        .toString();
+            }
         }
     }
 
@@ -113,43 +162,11 @@ public class Poll {
     public void setPollClosingDate(String pollClosingDate) {
         System.out.println("pollClosingDate value = " + pollClosingDate);
         System.out.println("canEdit = " + canEdit);
-        System.out.println("isActive = " + isActive);
-        if (pollClosingDate.equals("inf")) {
-            this.pollClosingDate = pollClosingDate;
-            System.out.println("pollClosingDate was inf");
-        } else if (canEdit && !isActive) {
-            System.out.println("setting poll closing date based on time limit: " + timeLimit);
-            this.pollClosingDate = ITimeDuration
-                    .timeDurationFromStringOfTimeUnits(this.timeLimit)
-                    .futureZonedDateTimeFromTimeDuration()
-                    .toString();
+        if (this.canEdit != null && this.canEdit) {
+            updatePollClosingDate();
         } else {
             this.pollClosingDate = pollClosingDate;
-            System.out.println("none of the above");
         }
-        System.out.println("set the closing date to: " + this.pollClosingDate);
-        /*
-        1. Poll does not exist.
-
-        2. Poll is created:
-           canEdit = true && isActive = false;
-           The poll can be edited, so the poll closing date should
-           be auto renewed based on timeLimit, unless no timeLimit
-           is specified (timeLimit = "inf").
-
-        3. Poll is finished (published to the masses) and can now be voted on:
-           canEdit = false && isActive = true;
-           Users can vote on the poll, and it is no longer possible
-           to make changes to the poll.
-           Poll closing date should have been updated when the poll was published,
-           and users should somehow see the time left until that date.
-           Poll closing date should no longer be changed.
-
-       4. Poll is closed:
-          canEdit = false && isActive = false;
-          Poll has ended, either because it reached pollClosingDate,
-          or the creator manually closed the poll.
-       */
     }
 
     public Boolean getPublic() {
