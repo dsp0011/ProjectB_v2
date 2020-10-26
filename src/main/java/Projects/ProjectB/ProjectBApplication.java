@@ -8,39 +8,21 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.time.ZonedDateTime;
 
 @SpringBootApplication
 public class ProjectBApplication {
 
-	//private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.class);
+    //private static final Logger log = LoggerFactory.getLogger(ProjectBApplication.class);
 
-	public static void main(String[] args) {
-		SpringApplication.run(ProjectBApplication.class, args);
-	}
-/*
-	@Bean
-	public CommandLineRunner demo(PollRepository repository) {
-		return (args) -> {
-			// save a few customers
-			repository.save(new Poll("red or blue?", "red", "blue",
-					"Days:0,Hours:1,Minutes:0,Seconds:30", true, false, null));
-			for (Poll poll : repository.findAll()) {
-				log.info(poll.getTimeLimit());
-				log.info(poll.getPollClosingDate().toString());
-				String newPollClosingDate = ITimeDuration
-						.timeDurationFromStringOfTimeUnits(poll.getTimeLimit())
-						.futureZonedDateTimeFromTimeDuration()
-						.toString();
-				poll.setPollClosingDate(newPollClosingDate);
-				log.info(newPollClosingDate);
-				log.info("");
-				log.info(poll.getPollClosingDate());
-			}
+    public static void main(String[] args) {
+        SpringApplication.run(ProjectBApplication.class, args);
+    }
 
-			log.info(ZonedDateTime.now().toString());
-		};
-	}
-*/
 }

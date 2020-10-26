@@ -74,7 +74,12 @@ public class User {
     }
 
     public void setPollsVotedOn(List<Poll> pollsVotedOn) {
-        this.pollsVotedOn = pollsVotedOn;
+        if (this.pollsVotedOn == null) {
+            this.pollsVotedOn = pollsVotedOn;
+        }
+        else {
+            this.pollsVotedOn.add(pollsVotedOn.get(0));
+        }
     }
 
     public List<Poll> getPollsCreated() {

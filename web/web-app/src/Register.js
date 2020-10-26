@@ -17,7 +17,7 @@ class Register extends Component {
         // get a callback when the server responds
         xhr.addEventListener('load', () => {
         // update the state of the component with the result here
-        console.log(xhr.responseText) 
+            console.log(xhr.responseText) 
         })
         // open the request with the verb and the url
         xhr.open('POST', 'http://localhost:8080/users')
@@ -26,10 +26,10 @@ class Register extends Component {
         //create JSON string reqeust
         console.log("state", this.state)
         const jsonString = JSON.stringify( {
-                            userName: this.state.username,
-                            password: this.state.password,
-                            firstName: this.state.firstName,
-                            lastName: this.state.lastName
+                            "userName": this.state.username,
+                            "password": this.state.password,
+                            "firstName": this.state.firstName,
+                            "lastName": this.state.lastName
 
         })
         console.log("jsonString", jsonString)

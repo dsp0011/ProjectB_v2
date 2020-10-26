@@ -4,6 +4,7 @@ import MainPage from './MainPage.js'
 import Login from './Login.js';
 import Register from './Register.js';
 import PollParticipate from './PollParticipate.js';
+import PollCreate from './PollCreate.js';
 import ViewPoll from './ViewPoll.js';
 import PollSearch from './PollSearch.js';
 import UserPolls from './UserPolls.js'
@@ -11,13 +12,8 @@ import { SessionContext, getSessionCookie, setSessionCookie } from "./Session.js
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
 function App() {
-  const [session, setSession] = useState(getSessionCookie());
-  useEffect(
-    () => {
-      setSession(getSessionCookie());
-    },
-    [session]
-  );
+  const [session] = useState(getSessionCookie());
+
   return (
     <SessionContext.Provider value={session}>
       <Router >
@@ -27,8 +23,9 @@ function App() {
               <Route path='/login' component={Login} />
               <Route path='/polls/search' component={PollSearch} />
               <Route path='/polls/view/:pollID' component={ViewPoll} />
-              <Route path='/polls/:username' component={UserPolls} />
+              <Route path='/users/:username/' component={UserPolls} />
               <Route path='/polls/vote/:pollID' component={PollParticipate}/>
+              <Route path='/users/create/:username' component={PollCreate}/>
           </Switch>
       </Router>
     </SessionContext.Provider>

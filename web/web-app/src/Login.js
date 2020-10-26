@@ -4,38 +4,47 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { Typography } from '@material-ui/core';
 import { SessionContext, getSessionCookie, setSessionCookie, updateSessionCookie } from "./Session.js";
-
+import Alert from '@material-ui/lab/Alert';
 
 class Login extends Component {
     static context = SessionContext;
 
-    updateSessionUsername = (username) => {
-        console.log("username: ", username)
-    }
- 
-
     componentDidMount() {
-
-        const wow = 
-            {
-              anchor: "right",
-              direction: "column",
-            }
-        setSessionCookie(wow)
-        console.log("woooow", getSessionCookie())
-        updateSessionCookie("anchor", "noooooooooooooooooooo")
-        console.log("woooow2", getSessionCookie())
 
     }
 
     handleLogin = () => {
-        this.matchUser()
-    }
-    // Cgecj
+        const username = getSessionCookie().username
+        const password = getSessionCookie().password
 
-    checkCredentials = (username) => {
+        const xhr = new XMLHttpRequest()
 
+        xhr.addEventListener('load', () => {
+            const data = xhr.responseText
+            console.log("data: ", data)
+            if (data != "") {
+                const jsonResponse = JSON.parse(data)
+                const actualPassword = jsonResponse["password"]
+                console.log("password: ", password,
+                            "\n actual password: ", actualPassword,
+                            "\n username: ", username)
+    
+            if (password === actualPassword || data == "" )
+                this.props.history.push("/users/" +username); 
+
+            }
+            else {
+                alert("Invalid information, try again")
+            }
+            
+        })
+        const URL = 'http://localhost:8080/users/' + username
+
+        xhr.open('GET', URL)
+        // send the request
+        xhr.send(URL)
     }
+
     render() {
         return (
             <div>
@@ -88,7 +97,7 @@ class Login extends Component {
                         inputProps={{style: { textAlign: 'left', fontSize: 30}}}
                         InputLabelProps={{style: {textAlign: 'center', fontSize: 30}}}
                         
-                        onChange = {e => {this.updateSessionUsername(e.target.value)}}
+                        onChange = {e => {updateSessionCookie("username", e.target.value);}}
                         style = {{ top:"17vh",
                                     position:"relative",
                                     left: "20%",
@@ -96,11 +105,11 @@ class Login extends Component {
                     />
                     <TextField 
                         id="outlined-basic" 
-                        label="Passowrd" 
+                        label="Password" 
                         variant="filled" 
                         inputProps={{style: { textAlign: 'left', fontSize: 30}}}
                         InputLabelProps={{style: {textAlign: 'left', fontSize: 30}}}
-                        onChange = {e => {this.setState({ pollID: e.target.value});}}
+                        onChange = {e => {updateSessionCookie("password", e.target.value);}}
                         style = {{ top:"22vh",
                                     position:"relative",
                                     left: "20%",
@@ -112,7 +121,7 @@ class Login extends Component {
                 <Button 
                     variant="contained"
                     color = "secondary"
-                    onClick = {e => {alert(this.state.pollID)}} // send HTTP request here
+                    onClick = {e => {this.handleLogin();}} // send HTTP request here
                     style = {{ width:"60vh",
                                position:"relative"   ,
                                top:"30vh",     

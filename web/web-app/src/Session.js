@@ -11,6 +11,7 @@ export const updateSessionCookie = (key, value) => {
     sessionCookie[key] = value
     Cookies.remove("session");
     Cookies.set("session", sessionCookie, { expires: 14 });
+
   };
   
 
@@ -22,7 +23,7 @@ export const getSessionCookie = () => {
   const sessionCookie = Cookies.get("session");
 
   if (sessionCookie === undefined) {
-    return "";
+    return "anonymous";
   } else {
     return JSON.parse(sessionCookie);
   }
