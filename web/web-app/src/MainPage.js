@@ -4,12 +4,21 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import { shadows } from '@material-ui/system';
-
-
+import Checkbox from '@material-ui/core/Checkbox';
+import { initializeCookie, getSessionCookie} from "./Session.js";
 class MainPage extends Component {
     constructor(props) {
         super(props);
         this.state = {pollID: "0"}
+    }
+
+    componentDidMount() {
+        
+        if (getSessionCookie() === "anonymous" || getSessionCookie() == undefined){
+            console.log("initializing cookie")
+            initializeCookie()
+            
+        }
     }
 
   
@@ -56,16 +65,30 @@ class MainPage extends Component {
                         onChange = {e => {this.setState({ pollID: e.target.value});}}
                     />
                 </Box>,
+
                 <Button 
                     variant="contained"
                     color = "secondary"
                     href = {"polls/vote/" + this.state.pollID}
                     elevation={20}
-                    style = {{ width:"60vh",
+                    style = {{ width:"29vh",
+                               right: "1vh",
                                position:"relative"   ,
                                top:"14vh",     
                             }}
-                >Submit
+                >Participate
+                </Button>
+                <Button 
+                    variant="contained"
+                    color = "secondary"
+                    href = {"polls/view/" + this.state.pollID}
+                    elevation={20}
+                    style = {{ width:"29vh",
+                               left: "1vh",
+                               position:"relative"   ,
+                               top:"14vh",     
+                            }}
+                >View
                 </Button>
     
             </Box>,
@@ -78,16 +101,7 @@ class MainPage extends Component {
                 alignItems="flex-end"
             >
                 <Grid item>
-                    <Button 
-                        variant="contained"
-                        color = "secondary"
-                        style = {{ width:"20vh",
-                                position:"absolute",
-                                right:"5vh",
-                                top:"95vh"
-                                }}
-                    >Search Poll
-                    </Button>
+
                 </Grid>
                 <Grid item>
                     <Button 
@@ -96,7 +110,7 @@ class MainPage extends Component {
                         href = "/login"
                         style = {{ width:"20vh",
                                 position:"absolute",
-                                right:"30vh",
+                                right:"5vh",
                                 top:"95vh"
                                 }}
                     >Login
@@ -109,7 +123,7 @@ class MainPage extends Component {
                         href = "/register"
                         style = {{ width:"20vh",
                                 position:"absolute",
-                                right:"55vh",
+                                right:"30vh",
                                 top:"95vh"
                                 }}
                             

@@ -9,6 +9,9 @@ import java.util.List;
 @Table(name = "pollUser")
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+    @Column(unique = true)
     private String userName;
     private String password;
     private String firstName;
@@ -20,6 +23,13 @@ public class User {
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
     private List<Poll> pollsCreated;
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
     public User() {
 
     }
@@ -73,12 +83,30 @@ public class User {
         return pollsVotedOn;
     }
 
+    public void addPollCreated(Poll pollCreated) {
+        if (this.pollsCreated == null) {
+            this.pollsCreated = new ArrayList<>();
+            this.pollsCreated.add(pollCreated);
+        } else {
+            this.pollsCreated.add(pollCreated);
+        }
+    }
+
+    public void addPollVotedOn(Poll pollVotedOn) {
+        if (this.pollsVotedOn == null) {
+            this.pollsVotedOn = new ArrayList<>();
+            this.pollsVotedOn.add(pollVotedOn);
+        } else {
+            this.pollsVotedOn.add(pollVotedOn);
+        }
+    }
+
     public void setPollsVotedOn(List<Poll> pollsVotedOn) {
         if (this.pollsVotedOn == null) {
             this.pollsVotedOn = pollsVotedOn;
         }
         else {
-            this.pollsVotedOn.add(pollsVotedOn.get(0));
+            this.pollsVotedOn.add(pollsVotedOn.get(0)); // TODO fix multiple votes same user error handling
         }
     }
 
@@ -87,7 +115,12 @@ public class User {
     }
 
     public void setPollsCreated(List<Poll> pollsCreated) {
-        this.pollsCreated = pollsCreated;
+        if (this.pollsCreated == null) {
+            this.pollsCreated = pollsCreated;
+        }
+        else {
+            this.pollsCreated.add(pollsCreated.get(0)); // TODO fix multiple votes same user error handling
+        }
     }
 
     @Override

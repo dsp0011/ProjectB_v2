@@ -16,22 +16,19 @@ class Login extends Component {
     handleLogin = () => {
         const username = getSessionCookie().username
         const password = getSessionCookie().password
-
         const xhr = new XMLHttpRequest()
 
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
-            console.log("data: ", data)
             if (data != "") {
                 const jsonResponse = JSON.parse(data)
-                const actualPassword = jsonResponse["password"]
-                console.log("password: ", password,
-                            "\n actual password: ", actualPassword,
-                            "\n username: ", username)
+                const actualPassword = jsonResponse.password
+                // console.log("password: ", password,
+                //             "\n actual password: ", actualPassword,
+                //             "\n username: ", username)
     
             if (password === actualPassword || data == "" )
                 this.props.history.push("/users/" +username); 
-
             }
             else {
                 alert("Invalid information, try again")

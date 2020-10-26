@@ -46,12 +46,16 @@ private IoTDeviceRepository ioTDeviceRepository;
 	@PutMapping("/users/{userName}")
 	public @ResponseBody User updateUser(@PathVariable String userName, @RequestBody User user) {
 		User oldUser = userRepository.findByUserName(userName);
-		oldUser.setFirstName(user.getFirstName());
-		oldUser.setLastName(user.getLastName());
-		oldUser.setPassword(user.getPassword());
-		oldUser.setPollsCreated(user.getPollsCreated());
-		oldUser.setPollsVotedOn(user.getPollsVotedOn());
-
+		if (user.getFirstName() != null)
+			oldUser.setFirstName(user.getFirstName());
+		if (user.getLastName() != null)
+			oldUser.setLastName(user.getLastName());
+		if (user.getPassword() != null)
+			oldUser.setPassword(user.getPassword());
+		if (user.getPollsCreated() != null)
+		    oldUser.addPollCreated(user.getPollsCreated().get(0));
+		if (user.getPollsVotedOn() != null)
+		    oldUser.addPollVotedOn(user.getPollsVotedOn().get(0));
 		return userRepository.save(oldUser);
 	}
 

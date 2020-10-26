@@ -5,6 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { ResponsivePie } from "@nivo/pie";
+import { getSessionCookie } from './Session';
 
 class ViewPoll extends Component {
 
@@ -104,6 +105,14 @@ class ViewPoll extends Component {
         console.log("props,", this.props)
         const data = this.getPollData(this.props.match.params.pollID); 
 
+    }
+
+    getExitPath = () => {
+        const username = getSessionCookie().username
+        if (username === undefined || username === "anonymous")
+            return "../../"
+        else 
+            return ("../../users/" + username)
     }
 
     render() {
@@ -225,7 +234,7 @@ class ViewPoll extends Component {
                 <Button 
                     variant="contained"
                     color = "secondary"
-                    onClick = {e => {alert(this.state.pollID)}} // send HTTP request here
+                    href = {this.getExitPath()} 
                     style = {{ width:"14vh",
                                left: "20vh",
                                position:"relative"   ,

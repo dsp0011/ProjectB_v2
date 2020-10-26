@@ -4,7 +4,7 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { Typography } from '@material-ui/core';
 import PropTypes from 'prop-types';
-import { SessionContext, getSessionCookie, setSessionCookie, updateSessionCookie } from "./Session.js";
+import { SessionContext, getSessionCookie, deleteSessionCookie, updateSessionCookie } from "./Session.js";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -42,12 +42,17 @@ class UserPolls extends Component {
 
     getUserPollsCreated = (username) => {
         const xhr = new XMLHttpRequest()
-
         xhr.addEventListener('load', () => {
-
+            const data = xhr.responseText
+            const jsonResponse = JSON.parse(data)
+            console.log("jsonResponse, ", jsonResponse.pollsVotedOn)
+            this.state.participatedPolls = jsonResponse.pollsVotedOn
+            console.log("state: ", this.state)
+            this.setState({isLoading :false})
             
         })
         const URL = 'http://localhost:8080/users/' + username
+        console.log("URL: ", URL)
         xhr.open('GET', URL)
         xhr.send(URL)
     }
@@ -139,7 +144,7 @@ class UserPolls extends Component {
                         <Button 
                         variant="contained"
                         color = "secondary"
-                        href = {"/create/" + getSessionCookie().username}
+                        onMouseDown = {e =>{ this.props.history.push("../../create")}}
                         style = {{ width:"30vh",
                                 position:"relative"   ,
                                 top:"10vh",   
@@ -150,6 +155,7 @@ class UserPolls extends Component {
                         <Button 
                         variant="contained"
                         color = "secondary"
+                        onMouseDown = {e =>{deleteSessionCookie(); this.props.history.push("/")}}
                         style = {{ width:"30vh",
                                 position:"relative"   ,
                                 top:"10vh",   

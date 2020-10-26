@@ -19,7 +19,61 @@ class PollCreate extends Component {
                       public: false}
     }
 
-  
+    // this.addUserCreatedPoll(); this.createPoll()
+    componentDidMount() {
+        console.log("mounted cookie ", getSessionCookie())
+    }
+    
+    addUserCreatedPoll = () => {
+        const xhr = new XMLHttpRequest()
+        const pollData = this.makePollJSON()
+        console.log("session cookie, addUserCreatedPoll ", getSessionCookie())
+        const URL = 'http://localhost:8080/users/' + getSessionCookie().username
+        xhr.open('PUT', URL)
+        xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        console.log("URL: ", URL)
+        //create JSON string reqeust
+        const jsonString = JSON.stringify( {pollsCreated: [pollData]})
+        console.log("jsonString", jsonString )
+        // send the request
+        xhr.send(jsonString)
+    }
+    makePollJSON = () => {
+
+        return (
+            {
+                question : this.state.question,
+                alternative1 :this.state.optionA,
+                alternative2 :this.state.optionB,
+                // creator : {userName: getSessionCookie().username},
+                creator: null,
+                timeLimit : this.state.timeLimit,
+                isPublic : false,
+                vote : {
+                    alternative1 : "0",
+                    alternative2 : "0"
+                }
+            }
+        )
+
+    }
+
+    createPoll = () => {
+
+        const xhr = new XMLHttpRequest()
+
+        const pollData = this.makePollJSON()
+        console.log("pollData")
+        const URL = 'http://localhost:8080/polls/'
+        xhr.open('POST', URL)
+        xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        //create JSON string reqeust
+        const jsonString = JSON.stringify(pollData)
+        // send the request
+        xhr.send(jsonString)
+    }
 
     sendUserPollCreateedUpdate = () => {
         if (getSessionCookie() == "anonymous")
@@ -43,13 +97,16 @@ class PollCreate extends Component {
         xhr.send(jsonString)
     }
 
-  
+    // TODO FIX BUG username resets 
     componentDidMount() {
-
+        
+        console.log("woooooooooow", getSessionCookie())
     }
 
     userCanAccessPoll = () => {
-        return (getSessionCookie() != "anonymous")
+        console.log("getSessionCookie(), ", getSessionCookie())
+        // return (getSessionCookie() !== "anonymous")
+        return true
     }
    
     render() {
@@ -101,12 +158,11 @@ class PollCreate extends Component {
     
                         <TextField 
                             id="outlined-basic" 
-                            defaultValue={this.state.question}
-                            value= {this.state.question}
+                            label="Question" 
                             variant="filled" 
-                            inputProps={{ readOnly: true,style: { textAlign: 'left', fontSize: 20}}}
+                            inputProps={{ style: { textAlign: 'left', fontSize: 20}}}
                             InputLabelProps={{style: {textAlign: 'center', fontSize: 35}}}
-                            onChange = {e => {this.setState({ pollID: e.target.value});}}
+                            onChange = {e => {this.setState({ question: e.target.value});}}
                             style = {{ top:"14vh",
                                         position:"relative",
                                         left: "10%",
@@ -114,12 +170,11 @@ class PollCreate extends Component {
                         />
                         <TextField 
                             id="outlined-basic" 
-                            defaultValue={this.state.optionA}
-                            value = {this.state.optionA}
+                            label="Option A" 
                             variant="outlined" 
-                            inputProps={{readOnly: true, style: { textAlign: 'left', fontSize: 20}}}
+                            inputProps={{ style: { textAlign: 'left', fontSize: 20}}}
                             InputLabelProps={{style: {textAlign: 'center', fontSize: 20}}}
-                            onChange = {e => {this.setState({ pollID: e.target.value});}}
+                            onChange = {e => {this.setState({ optionA: e.target.value});}}
                             style = {{ top:"19vh",
                                         position:"relative",
                                         left: "10%",
@@ -127,17 +182,28 @@ class PollCreate extends Component {
                         />
                         <TextField 
                             id="outlined-basic" 
-                            defaultValue={this.state.optionB}
-                            value = {this.state.optionB}
+                            label="Option B" 
                             variant="outlined" 
-                            inputProps={{readOnly: true, style: {textAlign: 'left', fontSize: 20}}}
+                            inputProps={{ style: {textAlign: 'left', fontSize: 20}}}
                             InputLabelProps={{style: {textAlign: 'left', fontSize: 20}}}
-                            onChange = {e => {this.setState({ pollID: e.target.value});}}
+                            onChange = {e => {this.setState({ optionB: e.target.value});}}
                             style = {{ top:"22vh",
                                         position:"relative",
                                         left: "10%",
                                         width: "35vh" }}
     
+                        />
+                        <TextField 
+                            id="outlined-basic" 
+                            label="Time limit" 
+                            variant="outlined" 
+                            inputProps={{ style: { textAlign: 'left', fontSize: 20}}}
+                            InputLabelProps={{style: {textAlign: 'center', fontSize: 20}}}
+                            onChange = {e => {this.setState({ timeLimit: e.target.value});}}
+                            style = {{ top:"25vh",
+                                        position:"relative",
+                                        left: "10%",
+                                        width: "35vh" }}
                         />
                        
                     </Box>,
@@ -145,37 +211,16 @@ class PollCreate extends Component {
                         component={Link}
                         variant="contained"
                         color = "secondary"
-                        // to = {"../view/" + this.props.match.params.pollID}
-                        onClick = {e => {this.sendVoteUpdate(1); this.sendUserPollVotedUpdate()}} // send HTTP request here
+                        // to = {"../users/" + getSessionCookie().username}
+                        onClick = {e => {this.createPoll(); this.addUserCreatedPoll();}} // send HTTP request here
                         style = {{ width:"27vh",
-                                   right: "-7vh",
                                    position:"relative"   ,
                                    top:"25vh",     
                                 }}
-                    >Vote Option A
+                    >Publish poll
                     </Button>
-                    <Button 
-                        component={Link}
-                        variant="contained"
-                        color = "secondary"
-                        // to = {"../view/" + this.props.match.params.pollID}
-                        onClick = {e => {this.sendVoteUpdate(2); this.sendUserPollVotedUpdate()}} // send HTTP request here
-                        style = {{ width:"27vh",
-                                   left: "9vh",
-                                   position:"relative"   ,
-                                   top:"25vh",     
-                                }}
-                    >Vote Option B
-                    </Button>
-                    <Typography variant="h6"
-                            style = {{ top:"16vh",
-                                       right: "44vh",
-                                        position:"relative",
-                             }}
-                        >
-                        Time Remaining:  {this.state.timeLimit}
-                        </Typography>
-    
+ 
+
                 </Box>,
                
              </div>
@@ -183,7 +228,6 @@ class PollCreate extends Component {
             );
         } else {
             {alert("Unauthorized access, redirecting to main page...")}
-            this.props.history.push("/");
             return (null);
 
         }

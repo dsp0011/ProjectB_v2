@@ -34,7 +34,7 @@ class PollParticipate extends Component {
         var jsonString = "";
         (alternative == 1) ?  jsonString = JSON.stringify( {alternative1: 1}) : jsonString = JSON.stringify( {alternative2: 1})
 
-
+        console.log("Json String: ", jsonString)
         // send the request
         xhr.send(jsonString)
 
@@ -49,7 +49,8 @@ class PollParticipate extends Component {
             console.log(xhr.data)
 
         })
-        const pollData = this.state.poll
+        const pollData = this.state.poll 
+        console.log("pollData")
         const URL = 'http://localhost:8080/users/' + getSessionCookie().username
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
@@ -57,6 +58,7 @@ class PollParticipate extends Component {
         console.log("poll data", pollData)
         //create JSON string reqeust
         const jsonString = JSON.stringify( {pollsVotedOn: [pollData]})
+        console.log("jsonString", jsonString )
         // send the request
         xhr.send(jsonString)
     }
@@ -84,7 +86,6 @@ class PollParticipate extends Component {
     }
 
     componentDidMount() {
-        console.log("props,", this.props)
         const data = this.getPollData(this.props.match.params.pollID); 
         for (const item in data) {
             console.log("item,", item)
@@ -92,10 +93,6 @@ class PollParticipate extends Component {
     }
 
     userCanAccessPoll = () => {
-        console.log("this.state.public: ", this.state.public)
-        console.log("getSessionCookie(): ", getSessionCookie())
-        console.log(this.state.public && getSessionCookie() == "anonymous")
-        console.log(!this.state.public &&  getSessionCookie() != "anonymous")
         return this.state.public
                || !this.state.public &&  getSessionCookie() != "anonymous"
     }
@@ -238,14 +235,5 @@ class PollParticipate extends Component {
        
     }
 }
-
-PollParticipate.defaultProps = {
-    pollID : "0000"
-}
-
-PollParticipate.propTypes = {
-    pollID : PropTypes.string
-}
-
 
 export default PollParticipate;
