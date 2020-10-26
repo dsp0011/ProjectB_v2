@@ -124,7 +124,7 @@ public class Controller {
     	String alternative1 = "" + json.get("alternative1");
     	String alternative2 = "" + json.get("alternative2");
     	String timeLimit = "" + json.get("timeLimit");
-    	boolean isPublic = Boolean.parseBoolean("" + json.get("isPublic"));
+    	boolean isPublic = Boolean.parseBoolean("" + json.get("public"));
     	String creatorUserName = "" + json.get("creator");
 		User creator = userRepository.findByUserName(creatorUserName);
 		if (creator == null) {
