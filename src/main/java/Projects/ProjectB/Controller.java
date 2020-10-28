@@ -51,22 +51,25 @@ public class Controller {
     	return evaluateUserCredentials(user, password, repeatPassword);
     }
 
+    /**
+     * Evaluate the given user credentials.
+     *
+     * @param user
+     * @param password
+     * @param repeatPassword
+     * @return The result of the evaluation.
+     */
     private String evaluateUserCredentials(User user, String password, String repeatPassword) {
-    	log.info("Evaluating user credentials");
+        log.info("Evaluating user credentials");
         String userName = user.getUserName();
-        if (userRepository.findByUserName(userName) != null) {
-            log.info("Username is already taken");
-            return "User was not saved\n" +
-                    "Username is already taken";
+        String result = evaluateUsername(userName);
+        if (!result.isEmpty()) {
+            return result;
         }
-
-        RuleResult result = PasswordValidation.validatePassword(password, userName);
-        if (!result.isValid()) {
-            log.info("Password was not valid");
-            return "User was not saved\n" +
-                    PasswordValidation.getRuleViolations(result);
+        result = evaluatePassword(password, userName);
+        if (!result.isEmpty()) {
+            return result;
         }
-
         if (password.equals(repeatPassword)) {
             userRepository.save(user);
             log.info("Saved user with valid password");
@@ -77,6 +80,51 @@ public class Controller {
                     "Password and repeated password did not match";
         }
     }
+
+    /**
+     * Check if the password is valid.
+     *
+     * @param password The password to check.
+     * @param userName The username of the user.
+     * @return The result of the evaluation.
+     */
+    private String evaluatePassword(String password, String userName) {
+        RuleResult result = PasswordValidation.validatePassword(password, userName);
+        if (!result.isValid()) {
+            log.info("Password was not valid");
+            return "User was not saved\n" +
+                    PasswordValidation.getRuleViolations(result);
+        }
+        return ""; // Nothing wrong with the password.
+    }
+
+	/**
+	 * Check that the username is not too long or too short,
+	 * and is not already being used by someone else.
+	 *
+	 * @param userName Username to be checked.
+	 * @return The result of the evaluation.
+	 */
+	private String evaluateUsername(String userName) {
+		final int MIN_USERNAME_LENGTH = 3;
+		final int MAX_USERNAME_LENGTH = 100;
+		if (userName.length() < MIN_USERNAME_LENGTH) {
+			log.info("Username was too short");
+			return "User was not saved\n" +
+					"Username is too short";
+		}
+		if (userName.length() > MAX_USERNAME_LENGTH) {
+			log.info("Username was too long");
+			return "User was not saved\n" +
+					"Username is too long";
+		}
+		if (userRepository.findByUserName(userName) != null) {
+			log.info("Username is already taken");
+			return "User was not saved\n" +
+					"Username is already taken";
+		}
+		return ""; // Nothing wrong with the username.
+	}
 
 	@GetMapping("/users")
 	public @ResponseBody Iterable<User> getAllUsers() {
