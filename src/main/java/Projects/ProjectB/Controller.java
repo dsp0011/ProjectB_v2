@@ -452,6 +452,10 @@ public class Controller {
 	public @ResponseBody Poll updateVote(@PathVariable long id, @RequestBody Vote vote) {
 		log.info("Attempting to alter an existing polls vote");
 		Poll poll = pollRepository.findById(id);
+		if (poll == null) {
+			log.info("Poll did not exist");
+			return null;
+		}
 		Vote newVote = poll.getVote();
 		newVote.setAlternative1(newVote.getAlternative1() + vote.getAlternative1());
 		newVote.setAlternative2(newVote.getAlternative2() + vote.getAlternative2());
