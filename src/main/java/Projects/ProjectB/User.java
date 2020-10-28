@@ -18,7 +18,7 @@ public class User {
     @Column(unique = true)
     private String userName;
 
-    private String password;
+    private String passwordAsHash;
     private String firstName;
     private String lastName;
 
@@ -36,7 +36,7 @@ public class User {
 
     public User(String userName, String password, String firstName, String lastName) {
         this.userName = userName;
-        setPassword(password);
+        setPasswordAsHash(password);
         this.firstName = firstName;
         this.lastName = lastName;
         this.idsOfPollsVotedOn = new ArrayList<>();
@@ -67,25 +67,12 @@ public class User {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordAsHash() {
+        return passwordAsHash;
     }
 
-    public void setPassword(String password) {
-        // Fine tune this to take roughly 1 second
-        // when deploying on cloud server.
-        final int SALT_LENGTH = 16;
-        final int HASH_LENGTH = 32;
-        final int ITERATIONS = 2;
-        final int ONE_MEGABYTE_IN_KIBIBYTES = 1024;
-        final int MEMORY_REQUIRED = 64 * ONE_MEGABYTE_IN_KIBIBYTES;
-        final int PARALLELISM = 1;
-        PasswordEncoder passwordEncoder = new Argon2PasswordEncoder(SALT_LENGTH,
-                HASH_LENGTH,
-                PARALLELISM,
-                MEMORY_REQUIRED,
-                ITERATIONS);
-        this.password = passwordEncoder.encode(password);
+    public void setPasswordAsHash(String password) {
+        this.passwordAsHash = PasswordRandomizer.encodePassword(password);
     }
 
     public String getFirstName() {
@@ -128,7 +115,7 @@ public class User {
                         "password='%s', " +
                         "firstName='%s', " +
                         "lastName='%s']",
-                id, userName, password, firstName, lastName
+                id, userName, passwordAsHash, firstName, lastName
         );
     }
 }

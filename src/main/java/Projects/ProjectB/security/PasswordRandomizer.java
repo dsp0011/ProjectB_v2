@@ -27,7 +27,7 @@ public class PasswordRandomizer {
 
     public static void randomiseOneUsersPassword(UserRepository userRepository, User user) {
         log.info("Replacing user password with a generated one");
-        user.setPassword(generateNewPassword());
+        user.setPasswordAsHash(generateNewPassword());
         userRepository.save(user);
     }
 
@@ -36,7 +36,7 @@ public class PasswordRandomizer {
     public static void randomiseAllUserPasswords(UserRepository userRepository) {
         log.info("Randomizing all user passwords");
         for (User user : userRepository.findAll()) {
-            user.setPassword(generateNewPassword());
+            user.setPasswordAsHash(generateNewPassword());
             userRepository.save(user);
         }
     }
