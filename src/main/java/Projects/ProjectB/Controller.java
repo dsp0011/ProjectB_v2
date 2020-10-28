@@ -1,7 +1,7 @@
 package Projects.ProjectB;
 
+import Projects.ProjectB.rabbitmq.Publisher;
 import Projects.ProjectB.time.ITimeDuration;
-import Projects.ProjectB.time.TimeDuration;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +21,12 @@ private PollRepository pollRepository;
 @Autowired
 private IoTDeviceRepository ioTDeviceRepository;
 
+@Autowired
+private Publisher publisher;
 
-/*
-			USER REQUESTS
- */
+	/*
+                USER REQUESTS
+     */
     @PostMapping("/users")
     public String createUser(@RequestBody User user) {
         userRepository.save(user);
@@ -65,10 +67,9 @@ private IoTDeviceRepository ioTDeviceRepository;
 /*
 			POLL REQUESTS
  */
-
     @PostMapping("/polls")
 	public String createPoll(@RequestBody Poll poll) {
-		pollRepository.save(poll);
+    	pollRepository.save(poll);
 		return "Poll saved";
 	}
 
@@ -107,6 +108,15 @@ private IoTDeviceRepository ioTDeviceRepository;
 		}
 		oldPoll.setVote(poll.getVote());
 		oldPoll.setIotDevices(poll.getIotDevices());
+
+
+		// Sending message
+		if (wasActive == false && isActive == true) {
+			publisher.sendMessage(oldPoll, "poll.open");
+		} else if (wasActive == true && isActive == false) {
+			publisher.sendMessage(oldPoll, "poll.close");
+		}
+
 
 		return pollRepository.save(oldPoll);
 	}
