@@ -43,6 +43,7 @@ public class Controller {
     	String repeatPassword = "" + json.get("repeatPassword");
     	String firstName = "" + json.get("firstName");
     	String lastName = "" + json.get("lastName");
+    	// TODO: Check if firstname and lastname is empty?
 		Instant start = Instant.now();
     	User user = new User(userName, password, firstName, lastName);
 		Instant end = Instant.now();
@@ -141,16 +142,73 @@ public class Controller {
 	}
 
 	@PutMapping("/users/{userName}")
-	public @ResponseBody User updateUser(@PathVariable String userName, @RequestBody User user) {
+	public @ResponseBody User updateUser(@PathVariable String userName,
+										 @RequestBody Map<String, String> json) {
     	log.info("Attempting to alter existing user");
-		User oldUser = userRepository.findByUserName(userName);
-		oldUser.setFirstName(user.getFirstName());
-		oldUser.setLastName(user.getLastName());
-		oldUser.setPassword(user.getPassword());
-		oldUser.setPollsCreated(user.getPollsCreated());
-		oldUser.setPollsVotedOn(user.getPollsVotedOn());
+		User user = userRepository.findByUserName(userName);
+    	if (user == null) {
+    		log.info("User did not exist in the database");
+    		return null;
+		}
+		String newUserName = "" + json.get("newUserName");
+		String newPassword = "" + json.get("newPassword");
+		String repeatedNewPassword = "" + json.get("repeatedNewPassword");
+		String newFirstName = "" + json.get("newFirstName");
+		String newLastName = "" + json.get("newLastName");
+		updateFirstName(user, newFirstName);
+		updateLastName(user, newLastName);
+		updateUsername(user, newUserName);
+		updatePassword(user, newPassword, repeatedNewPassword);
+		return user;
+	}
 
-		return userRepository.save(oldUser);
+	private void updateFirstName(User user, String newFirstName) {
+		if (!newFirstName.isEmpty()) {
+			user.setFirstName(newFirstName);
+			userRepository.save(user);
+			log.info("Updated user's firstName");
+		}
+	}
+
+	private void updateLastName(User user, String newLastName) {
+		if (!newLastName.isEmpty()) {
+			user.setLastName(newLastName);
+			userRepository.save(user);
+			log.info("Updated user's lastName");
+		}
+	}
+
+	private void updateUsername(User user, String newUserName) {
+		if (!newUserName.isEmpty()) {
+			if (evaluateUsername(newUserName).isEmpty()) {
+				if (!PasswordRandomizer.passwordsMatch(newUserName, user.getPasswordAsHash())) {
+					// New username cant be equal to the existing password.
+					user.setUserName(newUserName);
+					userRepository.save(user);
+					log.info("Updated user's username");
+				} else {
+					log.info("New username was not valid");
+				}
+			} else {
+				log.info("New username was not valid");
+			}
+		}
+	}
+
+	private void updatePassword(User user, String newPassword, String repeatedNewPassword) {
+		if (!newPassword.isEmpty()) {
+			if (evaluatePassword(newPassword, user.getUserName()).isEmpty()) {
+				if (newPassword.equals(repeatedNewPassword)) {
+					user.setPasswordAsHash(newPassword);
+					userRepository.save(user);
+					log.info("Updated user's password");
+				} else {
+					log.info("New password and repeated password did not match");
+				}
+			} else {
+				log.info("New password was not valid");
+			}
+		}
 	}
 
 	@DeleteMapping("/users/{userName}")
@@ -159,7 +217,6 @@ public class Controller {
 		userRepository.delete(userRepository.findByUserName(userName));
 		return "User deleted";
 	}
-
 
 /*
 			POLL REQUESTS
