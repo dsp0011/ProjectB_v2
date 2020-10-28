@@ -351,8 +351,17 @@ public class Controller {
 	@DeleteMapping("/devices/{id}")
 	public String deleteDevice(@PathVariable long id) {
 		log.info("Attempting to delete an existing IoT device");
-		ioTDeviceRepository.delete(ioTDeviceRepository.findById(id));
-		return "Device deleted";
+		IotDevice iotDevice = ioTDeviceRepository.findById(id);
+		if (iotDevice != null) {
+			long iotDeviceId = iotDevice.getId();
+			ioTDeviceRepository.delete(iotDevice);
+			log.info("Successfully deleted the IoT device with ID: " + iotDeviceId);
+			return "Device deleted";
+		} else {
+			log.info("IoT device did not exist");
+			return "Device was not deleted\n" +
+					"Device did not exist in the database";
+		}
 	}
 
 	/*
