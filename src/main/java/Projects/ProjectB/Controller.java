@@ -163,7 +163,7 @@ public class Controller {
 	}
 
 	private void updateFirstName(User user, String newFirstName) {
-		if (!newFirstName.isEmpty()) {
+		if (!newFirstName.isEmpty() && !newFirstName.equals("null")) {
 			user.setFirstName(newFirstName);
 			userRepository.save(user);
 			log.info("Updated user's firstName");
@@ -171,7 +171,7 @@ public class Controller {
 	}
 
 	private void updateLastName(User user, String newLastName) {
-		if (!newLastName.isEmpty()) {
+		if (!newLastName.isEmpty() && !newLastName.equals("null")) {
 			user.setLastName(newLastName);
 			userRepository.save(user);
 			log.info("Updated user's lastName");
@@ -179,7 +179,7 @@ public class Controller {
 	}
 
 	private void updateUsername(User user, String newUserName) {
-		if (!newUserName.isEmpty()) {
+		if (!newUserName.isEmpty() && !newUserName.equals("null")) {
 			if (evaluateUsername(newUserName).isEmpty()) {
 				if (!PasswordRandomizer.passwordsMatch(newUserName, user.getPasswordAsHash())) {
 					// New username cant be equal to the existing password.
@@ -196,7 +196,7 @@ public class Controller {
 	}
 
 	private void updatePassword(User user, String newPassword, String repeatedNewPassword) {
-		if (!newPassword.isEmpty()) {
+		if (!newPassword.isEmpty()  && !newPassword.equals("null")) {
 			if (evaluatePassword(newPassword, user.getUserName()).isEmpty()) {
 				if (newPassword.equals(repeatedNewPassword)) {
 					user.setPasswordAsHash(newPassword);
