@@ -309,9 +309,18 @@ public class Controller {
 
 	@DeleteMapping("/polls/{id}")
 	public String deletePoll(@PathVariable long id) {
-    	log.info("Attempting to delete a poll");
-		pollRepository.delete(pollRepository.findById(id));
-		return "Poll deleted";
+		log.info("Attempting to delete a poll");
+		Poll poll = pollRepository.findById(id);
+		if (poll != null) {
+			long pollId = poll.getId();
+			pollRepository.delete(poll);
+			log.info("Successfully deleted the poll with ID: " + pollId);
+			return "Poll deleted";
+		} else {
+			log.info("Poll did not exist");
+			return "Poll was not deleted\n" +
+					"Poll did not exist in the database";
+		}
 	}
 
 	/*
