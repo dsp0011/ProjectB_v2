@@ -240,15 +240,15 @@ public class Controller {
 			POLL REQUESTS
  */
 
-    @PostMapping("/polls")
+	@PostMapping("/polls")
 	public String createPoll(@RequestBody Map<String, String> json) {
-    	log.info("Attempting to create a new poll");
-    	String question = "" + json.get("question");
-    	String alternative1 = "" + json.get("alternative1");
-    	String alternative2 = "" + json.get("alternative2");
-    	String timeLimit = "" + json.get("timeLimit");
-    	boolean isPublic = Boolean.parseBoolean("" + json.get("public"));
-    	String creatorUserName = "" + json.get("creator");
+		log.info("Attempting to create a new poll");
+		String question = "" + json.get("question");
+		String alternative1 = "" + json.get("alternative1");
+		String alternative2 = "" + json.get("alternative2");
+		String timeLimit = "" + json.get("timeLimit");
+		boolean isPublic = Boolean.parseBoolean("" + json.get("public"));
+		String creatorUserName = "" + json.get("creator");
 		User creator = userRepository.findByUserName(creatorUserName);
 		if (creator == null) {
 			log.info("Creator did not exist in the database");
@@ -267,43 +267,114 @@ public class Controller {
 
 	@GetMapping("/polls")
 	public @ResponseBody Iterable<Poll> getAllPolls() {
-    	log.info("Getting all polls");
+		log.info("Getting all polls");
 		// This returns a JSON or XML with the users
 		return pollRepository.findAll();
 	}
 
 	@GetMapping("/polls/{id}")
 	public @ResponseBody Poll getPoll(@PathVariable long id) {
-    	log.info("Attempting to get existing poll");
+		log.info("Attempting to get existing poll");
 		// This returns a JSON or XML with the users
 		return pollRepository.findById(id);
 	}
 
 	@PutMapping("/polls/{id}")
 	public @ResponseBody
-	Poll updatePoll(@PathVariable long id, @RequestBody Map<String, String> json) {
+	Poll updatePoll(@PathVariable long id,
+					@RequestBody Map<String, String> json) {
 		log.info("Attempting to alter existing poll");
-		Poll oldPoll = pollRepository.findById(id);
-		if (oldPoll == null) {
+		Poll poll = pollRepository.findById(id);
+		if (poll == null) {
 			log.info("Poll did not exist in the database");
 			return null;
-		} else if (!oldPoll.getCanEdit()) {
-			log.info("Poll was already published and could not be altered");
-			return oldPoll;
+		} else if (!poll.getCanEdit()) {
+			boolean closePoll = Boolean.parseBoolean("" + json.get("closePoll"));
+			if (closePoll) {
+				closeThePoll(poll);
+			} else {
+				log.info("Poll was already published and could not be altered");
+			}
+			return poll;
 		} else {
-			String question = "" + json.get("question");
-			String alternative1 = "" + json.get("alternative1");
-			String alternative2 = "" + json.get("alternative2");
-			String timeLimit = "" + json.get("timeLimit");
-			boolean isPublic = Boolean.parseBoolean("" + json.get("public"));
-
-			oldPoll.setQuestion(question);
-			oldPoll.setAlternative1(alternative1);
-			oldPoll.setAlternative2(alternative2);
-			oldPoll.setTimeLimit(timeLimit);
-			oldPoll.setPublic(isPublic);
+			String newQuestion = "" + json.get("newQuestion");
+			String newAlternative1 = "" + json.get("newAlternative1");
+			String newAlternative2 = "" + json.get("newAlternative2");
+			String newTimeLimit = "" + json.get("newTimeLimit");
+			String newIsPublic = "" + json.get("stillPublic");
+			boolean publish = Boolean.parseBoolean("" + json.get("publishPoll"));
+			updateQuestion(poll, newQuestion);
+			updateAlternative1(poll, newAlternative1);
+			updateAlternative2(poll, newAlternative2);
+			updateTimeLimit(poll, newTimeLimit);
+			updateIsPublic(poll, newIsPublic);
+			if (publish) {
+				publishThePoll(poll);
+			}
 			log.info("Successfully updated the poll");
-			return pollRepository.save(oldPoll);
+			return poll;
+		}
+	}
+
+	private void closeThePoll(Poll poll) {
+		if (poll.getActive() && !poll.getCanEdit()) {
+			// Only close if poll is published and active.
+			poll.closePoll();
+			pollRepository.save(poll);
+			log.info("The Poll was closed");
+		} else {
+			log.info("The poll was already closed");
+		}
+	}
+
+	private void updateQuestion(Poll oldPoll, String newQuestion) {
+		if (!newQuestion.isEmpty() && !newQuestion.equals("null")) {
+			oldPoll.setQuestion(newQuestion);
+			pollRepository.save(oldPoll);
+			log.info("Updated the poll's question");
+		}
+	}
+
+	private void updateAlternative1(Poll oldPoll, String newAlternative1) {
+		if (!newAlternative1.isEmpty() && !newAlternative1.equals("null")) {
+			oldPoll.setAlternative1(newAlternative1);
+			pollRepository.save(oldPoll);
+			log.info("Updated the poll's alternative1");
+		}
+	}
+
+	private void updateAlternative2(Poll oldPoll, String newAlternative2) {
+		if (!newAlternative2.isEmpty() && !newAlternative2.equals("null")) {
+			oldPoll.setAlternative2(newAlternative2);
+			pollRepository.save(oldPoll);
+			log.info("Updated the poll's alternative2");
+		}
+	}
+
+	private void updateTimeLimit(Poll poll, String newTimeLimit) {
+		if (!newTimeLimit.isEmpty() && !newTimeLimit.equals("null")) {
+			poll.setTimeLimit(newTimeLimit);
+			pollRepository.save(poll);
+			log.info("Updated the poll's time limit");
+		}
+	}
+
+	private void updateIsPublic(Poll poll, String newIsPublic) {
+		if (!newIsPublic.isEmpty() && !newIsPublic.equals("null")) {
+			poll.setPublic(Boolean.parseBoolean(newIsPublic));
+			pollRepository.save(poll);
+			log.info("Updated the poll's public status");
+		}
+	}
+
+	private void publishThePoll(Poll poll) {
+		if (poll.getCanEdit() && !poll.getActive()) {
+			// Only publish the poll if it has not yet been published.
+			poll.publishPoll();
+			pollRepository.save(poll);
+			log.info("The poll was published");
+		} else {
+			log.info("The poll has already been published");
 		}
 	}
 
