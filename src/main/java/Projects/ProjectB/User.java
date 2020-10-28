@@ -1,8 +1,7 @@
 package Projects.ProjectB;
 
 
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import Projects.ProjectB.security.PasswordRandomizer;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -22,11 +21,9 @@ public class User {
     private String firstName;
     private String lastName;
 
-    //@OneToMany(cascade = CascadeType.ALL)
     @ElementCollection
     private List<Long> idsOfPollsVotedOn;
 
-    //@OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
     @ElementCollection
     private List<Long> idsOfPollsCreated;
 
@@ -41,6 +38,10 @@ public class User {
         this.lastName = lastName;
         this.idsOfPollsVotedOn = new ArrayList<>();
         this.idsOfPollsCreated = new ArrayList<>();
+    }
+
+    public boolean verifyPassword(String password) {
+        return PasswordRandomizer.passwordsMatch(password, this.passwordAsHash);
     }
 
     public void createdANewPoll(Poll poll) {
