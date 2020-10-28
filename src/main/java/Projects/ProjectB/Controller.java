@@ -213,10 +213,28 @@ public class Controller {
 
 	@DeleteMapping("/users/{userName}")
 	public String deleteUser(@PathVariable String userName) {
-    	log.info("Attempting to delete a user");
-		userRepository.delete(userRepository.findByUserName(userName));
-		return "User deleted";
+		log.info("Attempting to delete a user");
+		User user = userRepository.findByUserName(userName);
+		if (user != null) {
+            removeUsersConnectionToCreatedPolls(user);
+            long userId = user.getId();
+			userRepository.delete(user);
+			log.info("Successfully deleted the user with ID: " + userId);
+			return "User deleted";
+		} else {
+			log.info("User did not exist");
+			return "User was not deleted\n" +
+					"User did not exist in the database";
+		}
 	}
+
+    private void removeUsersConnectionToCreatedPolls(User user) {
+	    // Removes foreign key constraints.
+        for (long pollId : user.getPollsCreated()) {
+            Poll poll = pollRepository.findById(pollId);
+            poll.setCreator(null);
+        }
+    }
 
 /*
 			POLL REQUESTS
