@@ -54,9 +54,9 @@ public class Controller {
     /**
      * Evaluate the given user credentials.
      *
-     * @param user
-     * @param password
-     * @param repeatPassword
+     * @param user The user to check.
+     * @param password The password to check.
+     * @param repeatPassword The repeated password for confirmation.
      * @return The result of the evaluation.
      */
     private String evaluateUserCredentials(User user, String password, String repeatPassword) {
