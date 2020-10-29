@@ -76,8 +76,7 @@ class PollCreate extends Component {
     }
 
     sendUserPollCreateedUpdate = () => {
-        if (getSessionCookie() == "anonymous")
-            return;
+
         const xhr = new XMLHttpRequest()
 
         xhr.addEventListener('load', () => {
@@ -92,7 +91,7 @@ class PollCreate extends Component {
         xhr.setRequestHeader('Content-Type', 'application/json');
         console.log("poll data", pollData)
         //create JSON string reqeust
-        const jsonString = JSON.stringify( {pollsVotedOn: [pollData]})
+        const jsonString = JSON.stringify( {pollsCreated: [pollData]})
         // send the request
         xhr.send(jsonString)
     }

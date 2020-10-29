@@ -11,7 +11,6 @@ export const initializeCookie = () => {
 }
 
 export const updateSessionCookie = (key, value) => {
-    console.log("wooo", Cookies.get("session"))
     const sessionCookie = JSON.parse(Cookies.get("session"));
     sessionCookie[key] = value
     Cookies.remove("session");

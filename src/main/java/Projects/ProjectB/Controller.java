@@ -53,7 +53,7 @@ private IoTDeviceRepository ioTDeviceRepository;
 		if (user.getPassword() != null)
 			oldUser.setPassword(user.getPassword());
 		if (user.getPollsCreated() != null)
-		    oldUser.addPollCreated(user.getPollsCreated().get(0));
+			oldUser.addPollCreated(user.getPollsCreated().get(0));
 		if (user.getPollsVotedOn() != null)
 		    oldUser.addPollVotedOn(user.getPollsVotedOn().get(0));
 		return userRepository.save(oldUser);

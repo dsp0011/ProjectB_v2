@@ -20,7 +20,7 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Poll> pollsVotedOn;
 
-    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Poll> pollsCreated;
 
     public long getId() {

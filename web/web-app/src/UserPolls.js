@@ -12,13 +12,17 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 
 class UserPolls extends Component {
     constructor(props) {
         super(props);
         this.state = {participatedPolls : [],
                       createdPolls : [],
-                      isLoading : true
+                      isLoading : true,
+                      checked : false
                         }
     }
 
@@ -45,8 +49,8 @@ class UserPolls extends Component {
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
-            console.log("jsonResponse, ", jsonResponse.pollsVotedOn)
-            this.state.participatedPolls = jsonResponse.pollsVotedOn
+            console.log("jsonResponse, ", jsonResponse.pollsCreated)
+            this.state.createdPolls = jsonResponse.pollsCreated
             console.log("state: ", this.state)
             this.setState({isLoading :false})
             
@@ -60,11 +64,11 @@ class UserPolls extends Component {
 
     componentDidMount() {
         this.getUserPollsParticipated(this.props.match.params.username)
+        this.getUserPollsCreated(this.props.match.params.username)
 
     }
     getUserPollParticiaptedAsRows = () => {
         const rows = []
-        console.log("wow", this.state.participatedPolls)
         for (const entry of this.state.participatedPolls) {
             console.log("entry: ", entry)
             rows.push(this.createData(
@@ -79,13 +83,45 @@ class UserPolls extends Component {
 
     }
 
+    getUserPollsCreatedAsRows = () => {
+        const rows = []
+        console.log( "this.state.createdPolls ", this.state.createdPolls)
+        if (this.state.createdPolls != undefined) {
+            for (const entry of this.state.createdPolls) {
+                console.log("entry: ", entry)
+                rows.push(this.createData(
+                            entry.id,
+                            entry.question,
+                            entry.public,
+                            entry.alternative1,
+                            entry.alternative2
+                ))
+            }
+        }
+
+        return rows
+
+    }
+
+
+
+    handleCheckbox = (e) => {
+        if (this.state.checked === true)
+            this.setState({checked : false})
+        else 
+            this.setState({checked : true})
+
+    }
     createData = (pollID, question, isPublic, optionA, optionB) => {
         return { pollID, question, isPublic, optionA, optionB };
       }
       
     renderTable = () => {
-        const rows = this.getUserPollParticiaptedAsRows()
-        console.log("rows: ", rows)
+        var rows = []
+        if (this.state.checked)
+            rows = this.getUserPollParticiaptedAsRows()
+        else 
+            rows = this.getUserPollsCreatedAsRows()
         return ( 
         <TableContainer component={Paper} style={{ width: "90%",
                                                    top: "20vh",
@@ -132,6 +168,12 @@ class UserPolls extends Component {
                         alignItems="flex-start"
                         minHeight="100vh"
                     >
+                    <FormGroup row>
+                    <FormControlLabel
+                        control={<Checkbox checked = {this.state.checked} onChange={e => {this.handleCheckbox(e);}} name="checkedA" />}
+                        label="Created Polls"
+                    />
+                    </FormGroup>
                         <Typography variant="h4"
                         style = {{ top:"10vh",
                                     left:"15vh",

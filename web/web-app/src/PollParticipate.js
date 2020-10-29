@@ -56,6 +56,7 @@ class PollParticipate extends Component {
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
         xhr.setRequestHeader('Content-Type', 'application/json');
         console.log("poll data", pollData)
+        console.log("URL", URL)
         //create JSON string reqeust
         const jsonString = JSON.stringify( {pollsVotedOn: [pollData]})
         console.log("jsonString", jsonString )
@@ -190,7 +191,7 @@ class PollParticipate extends Component {
                         component={Link}
                         variant="contained"
                         color = "secondary"
-                        to = {"../view/" + this.props.match.params.pollID}
+                        // to = {"../view/" + this.props.match.params.pollID}
                         onClick = {e => {this.sendVoteUpdate(1); this.sendUserPollVotedUpdate()}} // send HTTP request here
                         style = {{ width:"27vh",
                                    right: "-7vh",
@@ -203,7 +204,7 @@ class PollParticipate extends Component {
                         component={Link}
                         variant="contained"
                         color = "secondary"
-                        to = {"../view/" + this.props.match.params.pollID}
+                        // to = {"../view/" + this.props.match.params.pollID}
                         onClick = {e => {this.sendVoteUpdate(2); this.sendUserPollVotedUpdate()}} // send HTTP request here
                         style = {{ width:"27vh",
                                    left: "9vh",
