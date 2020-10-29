@@ -31,6 +31,10 @@ public class Poll {
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL)
     private List<IotDevice> iotDevices;
 
+    @Transient
+    @Autowired
+    private Publisher publisher;
+
     public Poll() {
     }
 
@@ -79,7 +83,7 @@ public class Poll {
             this.isActive = true;
 
             // Publish message
-            //publisher.sendMessage(this, "poll.open");
+            publisher.sendMessage(this, "poll.open");
 
         } else {
             throw new IllegalStateException("Poll has already been published");
@@ -94,7 +98,7 @@ public class Poll {
             this.isActive = false;
 
             // Publish message
-            //publisher.sendMessage(this, "poll.close");
+            publisher.sendMessage(this, "poll.close");
 
         } else {
             throw new IllegalStateException("Poll is not active and can therefore not be closed");
