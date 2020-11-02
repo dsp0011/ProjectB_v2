@@ -169,10 +169,10 @@ class UserPolls extends Component {
                         minHeight="100vh"
                     >
                     <FormGroup row>
-                    <FormControlLabel
-                        control={<Checkbox checked = {this.state.checked} onChange={e => {this.handleCheckbox(e);}} name="checkedA" />}
-                        label="Created Polls"
-                    />
+                        <FormControlLabel
+                            control={<Checkbox checked = {this.state.checked} onChange={e => {this.handleCheckbox(e);}} name="checkedA" />}
+                            label="Created Polls"
+                        />
                     </FormGroup>
                         <Typography variant="h4"
                         style = {{ top:"10vh",

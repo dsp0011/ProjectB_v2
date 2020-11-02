@@ -210,7 +210,7 @@ class PollCreate extends Component {
                         component={Link}
                         variant="contained"
                         color = "secondary"
-                        // to = {"../users/" + getSessionCookie().username}
+                        to = {"../users/" + getSessionCookie().username}
                         onClick = {e => {this.createPoll(); this.addUserCreatedPoll();}} // send HTTP request here
                         style = {{ width:"27vh",
                                    position:"relative"   ,
