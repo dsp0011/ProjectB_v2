@@ -16,9 +16,9 @@ public class Poll {
     private String alternative2;
     private String timeLimit; // The duration for how long the poll should remain active.
     private String pollClosingDate; // The target time for when the poll should close.
-    private Boolean isPublic;
-    private Boolean isActive;
-    private Boolean canEdit; // Specify if the poll is still editable.
+    private boolean isPublic;
+    private boolean isActive;
+    private boolean canEdit; // Specify if the poll is still editable.
 
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -160,9 +160,7 @@ public class Poll {
     }
 
     public void setPollClosingDate(String pollClosingDate) {
-        System.out.println("pollClosingDate value = " + pollClosingDate);
-        System.out.println("canEdit = " + canEdit);
-        if (this.canEdit != null && this.canEdit) {
+        if (this.canEdit) {
             updatePollClosingDate();
         } else {
             this.pollClosingDate = pollClosingDate;
