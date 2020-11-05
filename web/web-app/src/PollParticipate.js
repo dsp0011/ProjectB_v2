@@ -38,20 +38,13 @@ class PollParticipate extends Component {
         if (getSessionCookie() == "anonymous")
             return;
         const xhr = new XMLHttpRequest()
-
-        xhr.addEventListener('load', () => {
-            console.log(xhr.data)
-
-        })
         const pollData = this.state.poll
         pollData.public = this.state.public
-        console.log("pollData")
         const URL = 'http://localhost:8080/users/participatePoll/' + getSessionCookie().username
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Content-Type', 'application/json');
         //create JSON string reqeust
         const jsonString = JSON.stringify(this.makePollJSON())
-        console.log("sending", jsonString)
         // send the request
         xhr.send(jsonString)
     }
@@ -78,7 +71,6 @@ class PollParticipate extends Component {
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
-            console.log("jsonResponse, ", jsonResponse)
             this.setState({question: jsonResponse["question"],
                         optionA: jsonResponse["alternative1"],
                         optionB: jsonResponse["alternative2"],
@@ -90,17 +82,13 @@ class PollParticipate extends Component {
         })
         const URL = 'http://localhost:8080/polls/' + pollID
 
-        console.log("url", URL)
         xhr.open('GET', URL)
         // send the request
         xhr.send(URL)
     }
 
     componentDidMount() {
-        const data = this.getPollData(this.props.match.params.pollID); 
-        for (const item in data) {
-            console.log("item,", item)
-        }
+        this.getPollData(this.props.match.params.pollID); 
     }
 
     userCanAccessPoll = () => {

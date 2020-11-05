@@ -1,11 +1,9 @@
-import React, { Component } from 'react';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
-import { shadows } from '@material-ui/system';
-import Checkbox from '@material-ui/core/Checkbox';
-import { initializeCookie, getSessionCookie} from "./Session.js";
+import TextField from '@material-ui/core/TextField';
+import React, { Component } from 'react';
+import { getSessionCookie, initializeCookie } from "./Session.js";
 class MainPage extends Component {
     constructor(props) {
         super(props);
@@ -14,7 +12,6 @@ class MainPage extends Component {
 
     componentDidMount() {
         if (getSessionCookie() === "anonymous" || getSessionCookie() == undefined){
-            console.log("initializing cookie")
             initializeCookie()
         }
     }

@@ -11,20 +11,13 @@ class Register extends Component {
     }
 
     sendRegisterRequest = () => {
-        // create a new XMLHttpRequest
         const xhr = new XMLHttpRequest()
 
-        // get a callback when the server responds
         xhr.addEventListener('load', () => {
-        // update the state of the component with the result here
-            console.log(xhr.responseText) 
         })
-        // open the request with the verb and the url
         xhr.open('POST', 'http://localhost:8080/users')
         xhr.setRequestHeader('Content-Type', 'application/json');
 
-        //create JSON string reqeust
-        console.log("state", this.state)
         const jsonString = JSON.stringify( {
                             "userName": this.state.username,
                             "password": this.state.password,
@@ -33,8 +26,6 @@ class Register extends Component {
                             "repeatPassword" : this.state.repeatPassword
 
         })
-        console.log("jsonString", jsonString)
-        // send the request
         xhr.send(jsonString)
     }
 

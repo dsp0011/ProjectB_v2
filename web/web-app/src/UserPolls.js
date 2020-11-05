@@ -34,7 +34,6 @@ class UserPolls extends Component {
             
         })
         const URL = 'http://localhost:8080/users/' + username
-        console.log("URL: ", URL)
         xhr.open('GET', URL)
         xhr.send(URL)
     }
@@ -44,14 +43,11 @@ class UserPolls extends Component {
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
-            console.log("jsonResponse, created ", jsonResponse.pollsCreated)
             this.state.createdPolls = jsonResponse.pollsCreated
-            console.log("state: ", this.state)
             this.setState({isLoading :false})
             
         })
         const URL = 'http://localhost:8080/users/' + username
-        console.log("URL: ", URL)
         xhr.open('GET', URL)
         xhr.send(URL)
     }
@@ -65,7 +61,6 @@ class UserPolls extends Component {
     getUserPollParticiaptedAsRows = () => {
         const rows = []
         for (const entry of this.state.participatedPolls) {
-            console.log("entry: ", entry)
             rows.push(this.createData(
                         entry.id,
                         entry.question,
@@ -75,15 +70,12 @@ class UserPolls extends Component {
             ))
         }
         return rows
-
     }
 
     getUserPollsCreatedAsRows = () => {
         const rows = []
-        console.log( "this.state.createdPolls ", this.state.createdPolls)
         if (this.state.createdPolls != undefined) {
             for (const entry of this.state.createdPolls) {
-                console.log("entry: ", entry)
                 rows.push(this.createData(
                             entry.id,
                             entry.question,

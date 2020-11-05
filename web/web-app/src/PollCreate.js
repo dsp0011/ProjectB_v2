@@ -23,22 +23,18 @@ class PollCreate extends Component {
 
     // this.addUserCreatedPoll(); this.createPoll()
     componentDidMount() {
-        console.log("mounted cookie ", getSessionCookie())
     }
     
     addUserCreatedPoll = () => {
         const xhr = new XMLHttpRequest()
         const pollData = this.makePollJSON()
-        console.log("session cookie, addUserCreatedPoll ", getSessionCookie())
         const URL = 'http://localhost:8080/users/createPoll/' + getSessionCookie().username
         
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Content-type', 'application/json')
         
-        console.log("URL: ", URL)
         //create JSON string reqeust
         const jsonString = JSON.stringify(pollData)
-        console.log("jsonString", jsonString )
         // send the request
         xhr.send(jsonString)
     }
@@ -67,7 +63,6 @@ class PollCreate extends Component {
         const xhr = new XMLHttpRequest()
 
         const pollData = this.makePollJSON()
-        console.log("pollData")
         const URL = 'http://localhost:8080/polls/'
         xhr.open('POST', URL)
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*')

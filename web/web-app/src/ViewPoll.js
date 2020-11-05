@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
+import { Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import { Typography } from '@material-ui/core';
-import PropTypes from 'prop-types';
 import { ResponsivePie } from "@nivo/pie";
+import React, { Component } from 'react';
 import { getSessionCookie } from './Session';
 
 class ViewPoll extends Component {
@@ -80,8 +79,6 @@ class ViewPoll extends Component {
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
-            console.log("jsonResponse, ", jsonResponse)
-            console.log("jsonResponse[vote]", jsonResponse["vote"])
             this.setState({question: jsonResponse["question"],
                         optionA: jsonResponse["alternative1"],
                         optionB: jsonResponse["alternative2"],
@@ -89,20 +86,16 @@ class ViewPoll extends Component {
                         optionAVotes: jsonResponse["vote"]["alternative1"],
                         optionBVotes: jsonResponse["vote"]["alternative2"]
                     })
-            console.log("new state: ", this.state)
                 
             
         })
         const URL = 'http://localhost:8080/polls/' + pollID
 
-        console.log("url", URL)
         xhr.open('GET', URL)
-        // send the request
         xhr.send(URL)
     }
 
     componentDidMount() {
-        console.log("props,", this.props)
         const data = this.getPollData(this.props.match.params.pollID); 
 
     }
