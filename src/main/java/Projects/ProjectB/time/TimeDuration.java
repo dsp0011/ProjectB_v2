@@ -202,9 +202,9 @@ public class TimeDuration implements ITimeDuration {
     @Override
     public String toString() {
         return "Days: " + this.getDays()
-                + ", hours: " + this.getHours()
-                + ", minutes: " + this.getMinutes()
-                + ", seconds: " + this.getSeconds();
+                + ", Hours: " + this.getHours()
+                + ", Minutes: " + this.getMinutes()
+                + ", Seconds: " + this.getSeconds();
     }
 
     @Override

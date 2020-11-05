@@ -1,20 +1,18 @@
-import React, { Component, useEffect, useState, useContext } from "react";
+import { Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import { Typography } from '@material-ui/core';
-import PropTypes from 'prop-types';
-import { SessionContext, getSessionCookie, deleteSessionCookie, updateSessionCookie } from "./Session.js";
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormGroup from '@material-ui/core/FormGroup';
+import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import React, { Component } from "react";
+import { deleteSessionCookie, getSessionCookie } from "./Session.js";
 
 class UserPolls extends Component {
     constructor(props) {
@@ -28,13 +26,10 @@ class UserPolls extends Component {
 
     getUserPollsParticipated = (username) => {
         const xhr = new XMLHttpRequest()
-        console.log("username: ", username)
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
-            console.log("jsonResponse, ", jsonResponse.pollsVotedOn)
             this.state.participatedPolls = jsonResponse.pollsVotedOn
-            console.log("state: ", this.state)
             this.setState({isLoading :false})
             
         })
@@ -49,7 +44,7 @@ class UserPolls extends Component {
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
-            console.log("jsonResponse, ", jsonResponse.pollsCreated)
+            console.log("jsonResponse, created ", jsonResponse.pollsCreated)
             this.state.createdPolls = jsonResponse.pollsCreated
             console.log("state: ", this.state)
             this.setState({isLoading :false})
@@ -145,7 +140,7 @@ class UserPolls extends Component {
                         {row.pollID}
                     </TableCell>
                     <TableCell align="right">{row.question}</TableCell>
-                    <TableCell align="right">{row.isPublic}</TableCell>
+                    <TableCell align="right">{row.isPublic.toString()}</TableCell>
                     <TableCell align="right">{row.optionA}</TableCell>
                     <TableCell align="right">{row.optionB}</TableCell>
                     </TableRow>
@@ -170,15 +165,22 @@ class UserPolls extends Component {
                     >
                     <FormGroup row>
                         <FormControlLabel
-                            control={<Checkbox checked = {this.state.checked} onChange={e => {this.handleCheckbox(e);}} name="checkedA" />}
-                            label="Created Polls"
+                            style = {{ 
+                            position:"relative"   ,
+                            top:"12vh",   
+                            left: "94vh",
+                            color: "white"  
+                            }}
+                            control={<Checkbox style = {{color: "white"  }}checked = {this.state.checked} onChange={e => {this.handleCheckbox(e);}} name="checkedA" />}
+                            label="Participated Polls"
                         />
                     </FormGroup>
                         <Typography variant="h4"
-                        style = {{ top:"10vh",
-                                    left:"15vh",
+                        style = {{ top:"12vh",
+                                    left:"19vh",
                                     position:"relative",
-                                    color: "white"
+                                    color: "white",
+                                    width: "30vh"
                          }}
                         >
                             My polls
@@ -189,8 +191,8 @@ class UserPolls extends Component {
                         onMouseDown = {e =>{ this.props.history.push("../../create")}}
                         style = {{ width:"30vh",
                                 position:"relative"   ,
-                                top:"10vh",   
-                                left: "121vh"  
+                                top:"12vh",   
+                                left: "100vh"  
                                 }}
                         >Create a new poll
                         </Button>
@@ -200,8 +202,8 @@ class UserPolls extends Component {
                         onMouseDown = {e =>{deleteSessionCookie(); this.props.history.push("/")}}
                         style = {{ width:"30vh",
                                 position:"relative"   ,
-                                top:"10vh",   
-                                left: "62vh"  
+                                top:"12vh",   
+                                left: "55vh"  
                                 }}
                         >Log out
                         </Button>

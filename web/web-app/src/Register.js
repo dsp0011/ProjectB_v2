@@ -21,15 +21,16 @@ class Register extends Component {
         })
         // open the request with the verb and the url
         xhr.open('POST', 'http://localhost:8080/users')
-        xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
         xhr.setRequestHeader('Content-Type', 'application/json');
+
         //create JSON string reqeust
         console.log("state", this.state)
         const jsonString = JSON.stringify( {
                             "userName": this.state.username,
                             "password": this.state.password,
                             "firstName": this.state.firstName,
-                            "lastName": this.state.lastName
+                            "lastName": this.state.lastName,
+                            "repeatPassword" : this.state.repeatPassword
 
         })
         console.log("jsonString", jsonString)
@@ -141,10 +142,10 @@ class Register extends Component {
                         id="outlined-password-required" 
                         label="Repeat password" 
                         variant="filled" 
-                        type = "passwrod"
+                        type = "password"
                         inputProps={{style: { textAlign: 'left', fontSize: 30}}}
                         InputLabelProps={{style: {textAlign: 'left', fontSize: 30}}}
-                        // onChange = {e => {this.setState({ pollID: e.target.value});}} //TODO check pass
+                        onChange = {e => {this.setState({ repeatPassword: e.target.value});}} 
                         style = {{ top:"25vh",
                                     position:"relative",
                                     left: "20%",

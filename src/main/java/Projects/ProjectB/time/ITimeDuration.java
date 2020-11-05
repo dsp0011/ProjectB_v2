@@ -183,7 +183,7 @@ public interface ITimeDuration {
     static ITimeDuration timeDurationFromStringOfTimeUnits(String timeInTimeUnits) {
         String[] timeUnits = timeInTimeUnits.split(",");
         for (int i = 0; i < timeUnits.length; i++) {
-            timeUnits[i] = timeUnits[i].replaceAll("[^\\d]", ""); // Remove all characters not digits
+            timeUnits[i] = timeUnits[i].replaceAll("[^\\d-]", ""); // Remove all characters not digits
         }
         int days, hours, minutes, seconds;
         days = Integer.parseInt(timeUnits[0]);

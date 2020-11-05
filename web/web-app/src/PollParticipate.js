@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
+import { Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import { Typography } from '@material-ui/core';
-import PropTypes from 'prop-types';
-import {Link, LinkProps} from "react-router-dom";
+import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 import { getSessionCookie } from './Session';
 class PollParticipate extends Component {
 
@@ -22,20 +21,15 @@ class PollParticipate extends Component {
   
     sendVoteUpdate = (alternative) => {
         const xhr = new XMLHttpRequest()
-
         const URL = 'http://localhost:8080/votes/' + this.props.match.params.pollID
 
-        console.log("url", )
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
         xhr.setRequestHeader('Content-Type', 'application/json');
 
-        //create JSON string reqeust
         var jsonString = "";
         (alternative == 1) ?  jsonString = JSON.stringify( {alternative1: 1}) : jsonString = JSON.stringify( {alternative2: 1})
 
-        console.log("Json String: ", jsonString)
-        // send the request
         xhr.send(jsonString)
 
     }
@@ -49,19 +43,33 @@ class PollParticipate extends Component {
             console.log(xhr.data)
 
         })
-        const pollData = this.state.poll 
+        const pollData = this.state.poll
+        pollData.public = this.state.public
         console.log("pollData")
-        const URL = 'http://localhost:8080/users/' + getSessionCookie().username
+        const URL = 'http://localhost:8080/users/participatePoll/' + getSessionCookie().username
         xhr.open('PUT', URL)
-        xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
         xhr.setRequestHeader('Content-Type', 'application/json');
-        console.log("poll data", pollData)
-        console.log("URL", URL)
         //create JSON string reqeust
-        const jsonString = JSON.stringify( {pollsVotedOn: [pollData]})
-        console.log("jsonString", jsonString )
+        const jsonString = JSON.stringify(this.makePollJSON())
+        console.log("sending", jsonString)
         // send the request
         xhr.send(jsonString)
+    }
+
+    makePollJSON = () => {
+        return (
+            {
+                question : this.state.question,
+                pollID : this.state.pollID,
+                alternative1 :this.state.optionA,
+                alternative2 :this.state.optionB,
+                creator:getSessionCookie().username,
+                timeLimit : this.state.timeLimit,
+                public : this.state.public,
+
+            }
+        )
+
     }
 
     getPollData = (pollID) => {
@@ -70,12 +78,14 @@ class PollParticipate extends Component {
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
+            console.log("jsonResponse, ", jsonResponse)
             this.setState({question: jsonResponse["question"],
                         optionA: jsonResponse["alternative1"],
                         optionB: jsonResponse["alternative2"],
                         timeLimit: jsonResponse["timeLimit"],
                         public: jsonResponse["public"],
-                        poll : jsonResponse
+                        poll : jsonResponse,
+                        pollID : jsonResponse["id"]
                     })
         })
         const URL = 'http://localhost:8080/polls/' + pollID
@@ -192,9 +202,9 @@ class PollParticipate extends Component {
                         variant="contained"
                         color = "secondary"
                         to = {"../view/" + this.props.match.params.pollID}
-                        onClick = {e => {this.sendVoteUpdate(1); this.sendUserPollVotedUpdate()}} // send HTTP request here
+                        onClick = {e => {this.sendVoteUpdate(1); this.sendUserPollVotedUpdate()}}
                         style = {{ width:"27vh",
-                                   right: "-7vh",
+                                   right: "-9vh",
                                    position:"relative"   ,
                                    top:"25vh",     
                                 }}
@@ -205,9 +215,9 @@ class PollParticipate extends Component {
                         variant="contained"
                         color = "secondary"
                         to = {"../view/" + this.props.match.params.pollID}
-                        onClick = {e => {this.sendVoteUpdate(2); this.sendUserPollVotedUpdate()}} // send HTTP request here
+                        onClick = {e => {this.sendVoteUpdate(2); this.sendUserPollVotedUpdate()}}
                         style = {{ width:"27vh",
-                                   left: "9vh",
+                                   left: "10vh",
                                    position:"relative"   ,
                                    top:"25vh",     
                                 }}
@@ -215,7 +225,7 @@ class PollParticipate extends Component {
                     </Button>
                     <Typography variant="h6"
                             style = {{ top:"16vh",
-                                       right: "44vh",
+                                       right: "42vh",
                                         position:"relative",
                              }}
                         >

@@ -1,10 +1,12 @@
-import React, { Component } from 'react';
+import { Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormGroup from '@material-ui/core/FormGroup';
 import TextField from '@material-ui/core/TextField';
-import { Typography } from '@material-ui/core';
-import PropTypes from 'prop-types';
-import {Link, LinkProps} from "react-router-dom";
+import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 import { getSessionCookie } from './Session';
 class PollCreate extends Component {
 
@@ -15,7 +17,7 @@ class PollCreate extends Component {
         this.state = {question: "0",
                       optionA: "0",
                       optionB: "0",
-                      timeLimit: "0",
+                      timeLimit: "inf",
                       public: false}
     }
 
@@ -28,37 +30,38 @@ class PollCreate extends Component {
         const xhr = new XMLHttpRequest()
         const pollData = this.makePollJSON()
         console.log("session cookie, addUserCreatedPoll ", getSessionCookie())
-        const URL = 'http://localhost:8080/users/' + getSessionCookie().username
+        const URL = 'http://localhost:8080/users/createPoll/' + getSessionCookie().username
+        
         xhr.open('PUT', URL)
-        xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
-        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Content-type', 'application/json')
+        
         console.log("URL: ", URL)
         //create JSON string reqeust
-        const jsonString = JSON.stringify( {pollsCreated: [pollData]})
+        const jsonString = JSON.stringify(pollData)
         console.log("jsonString", jsonString )
         // send the request
         xhr.send(jsonString)
     }
     makePollJSON = () => {
-
         return (
             {
                 question : this.state.question,
                 alternative1 :this.state.optionA,
                 alternative2 :this.state.optionB,
-                // creator : {userName: getSessionCookie().username},
-                creator: null,
+                creator:getSessionCookie().username,
                 timeLimit : this.state.timeLimit,
-                isPublic : false,
-                vote : {
-                    alternative1 : "0",
-                    alternative2 : "0"
-                }
+                public : this.state.public,
             }
         )
 
     }
+    handleCheckbox = (e) => {
+        if (this.state.checked === true)
+            this.setState({public : false})
+        else 
+            this.setState({public : true})
 
+    }
     createPoll = () => {
 
         const xhr = new XMLHttpRequest()
@@ -75,35 +78,8 @@ class PollCreate extends Component {
         xhr.send(jsonString)
     }
 
-    sendUserPollCreateedUpdate = () => {
-
-        const xhr = new XMLHttpRequest()
-
-        xhr.addEventListener('load', () => {
-            console.log(xhr.data)
-
-        })
-        const pollData = this.state.poll 
-        console.log("pollData")
-        const URL = 'http://localhost:8080/users/' + getSessionCookie().username
-        xhr.open('PUT', URL)
-        xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        console.log("poll data", pollData)
-        //create JSON string reqeust
-        const jsonString = JSON.stringify( {pollsCreated: [pollData]})
-        // send the request
-        xhr.send(jsonString)
-    }
-
-    // TODO FIX BUG username resets 
-    componentDidMount() {
-        
-        console.log("woooooooooow", getSessionCookie())
-    }
 
     userCanAccessPoll = () => {
-        console.log("getSessionCookie(), ", getSessionCookie())
         // return (getSessionCookie() !== "anonymous")
         return true
     }
@@ -206,6 +182,17 @@ class PollCreate extends Component {
                         />
                        
                     </Box>,
+                    <FormGroup row>
+                        <FormControlLabel
+                            style = {{ 
+                            position:"relative"   ,
+                            top:"18vh",   
+                            left: "32vh",
+                            }}
+                            control={<Checkbox checked = {this.state.checked} onChange={e => {this.handleCheckbox(e);}} name="checkedA" />}
+                            label="Public"
+                        />
+                    </FormGroup>
                     <Button 
                         component={Link}
                         variant="contained"
@@ -214,7 +201,8 @@ class PollCreate extends Component {
                         onClick = {e => {this.createPoll(); this.addUserCreatedPoll();}} // send HTTP request here
                         style = {{ width:"27vh",
                                    position:"relative"   ,
-                                   top:"25vh",     
+                                   top:"25vh",
+                                   right:"5vh"     
                                 }}
                     >Publish poll
                     </Button>

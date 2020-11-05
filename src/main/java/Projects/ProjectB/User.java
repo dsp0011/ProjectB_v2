@@ -1,6 +1,8 @@
 package Projects.ProjectB;
 
 
+import Projects.ProjectB.security.PasswordRandomizer;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +15,22 @@ public class User {
     private long id;
     @Column(unique = true)
     private String userName;
-    private String password;
+
+    private String passwordAsHash;
     private String firstName;
     private String lastName;
+
+    @ElementCollection
+    private List<Long> idsOfPollsVotedOn;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Poll> pollsVotedOn;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Poll> pollsCreated;
+
+    @ElementCollection
+    private List<Long> idsOfPollsCreated;
 
     public long getId() {
         return id;
@@ -36,16 +45,26 @@ public class User {
 
     public User(String userName, String password, String firstName, String lastName) {
         this.userName = userName;
-        this.password = password;
+        setPasswordAsHash(password);
         this.firstName = firstName;
         this.lastName = lastName;
-        this.pollsVotedOn = new ArrayList<>();
-        this.pollsCreated = new ArrayList<>();
+//        this.idsOfPollsVotedOn = new ArrayList<>();
+//        this.idsOfPollsCreated = new ArrayList<>();
     }
 
-    public void createPoll(Poll poll) {
-        this.pollsCreated.add(poll);
+    public boolean verifyPassword(String password) {
+        return PasswordRandomizer.passwordsMatch(password, this.passwordAsHash);
     }
+
+    public void createdANewPoll(Poll poll) {
+        this.idsOfPollsCreated.add(poll.getId());
+    }
+
+    public void votedOnANewPoll(Poll poll) {
+        this.idsOfPollsVotedOn.add(poll.getId());
+    }
+
+
 
     public String getUserName() {
         return userName;
@@ -55,12 +74,12 @@ public class User {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordAsHash() {
+        return passwordAsHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordAsHash(String password) {
+        this.passwordAsHash = PasswordRandomizer.encodePassword(password);
     }
 
     public String getFirstName() {
@@ -79,10 +98,10 @@ public class User {
         this.lastName = lastName;
     }
 
+
     public List<Poll> getPollsVotedOn() {
         return pollsVotedOn;
     }
-
     public void addPollCreated(Poll pollCreated) {
         if (this.pollsCreated == null) {
             this.pollsCreated = new ArrayList<>();
@@ -101,33 +120,29 @@ public class User {
         }
     }
 
-    public void setPollsVotedOn(List<Poll> pollsVotedOn) {
-        if (this.pollsVotedOn == null) {
-            this.pollsVotedOn = pollsVotedOn;
-        }
-        else {
-            this.pollsVotedOn.add(pollsVotedOn.get(0)); // TODO fix multiple votes same user error handling
-        }
+
+    public void setPollsVotedOn(List<Long> idsOfPollsVotedOn) {
+        this.idsOfPollsVotedOn = idsOfPollsVotedOn;
     }
+
 
     public List<Poll> getPollsCreated() {
         return pollsCreated;
     }
 
-    public void setPollsCreated(List<Poll> pollsCreated) {
-        if (this.pollsCreated == null) {
-            this.pollsCreated = pollsCreated;
-        }
-        else {
-            this.pollsCreated.add(pollsCreated.get(0)); // TODO fix multiple votes same user error handling
-        }
+    public void setPollsCreatedID(List<Long> idsOfPollsCreated) {
+        this.idsOfPollsCreated = idsOfPollsCreated;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "User[userName='%s', password='%s', firstName='%s', lastName='%s']",
-                userName, password, firstName, lastName
+                "User[Id='%d', " +
+                        "userName='%s', " +
+                        "password='%s', " +
+                        "firstName='%s', " +
+                        "lastName='%s']",
+                id, userName, passwordAsHash, firstName, lastName
         );
     }
 }

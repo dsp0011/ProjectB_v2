@@ -1,17 +1,12 @@
-import React, { Component, useEffect, useState, useContext } from "react";
+import { Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import { Typography } from '@material-ui/core';
-import { SessionContext, getSessionCookie, setSessionCookie, updateSessionCookie } from "./Session.js";
-import Alert from '@material-ui/lab/Alert';
+import React, { Component } from "react";
+import { getSessionCookie, SessionContext, updateSessionCookie } from "./Session.js";
 
 class Login extends Component {
     static context = SessionContext;
-
-    componentDidMount() {
-
-    }
 
     handleLogin = () => {
         const username = getSessionCookie().username
@@ -23,11 +18,6 @@ class Login extends Component {
             if (data != "") {
                 const jsonResponse = JSON.parse(data)
                 const actualPassword = jsonResponse.password
-                // console.log("password: ", password,
-                //             "\n actual password: ", actualPassword,
-                //             "\n username: ", username)
-    
-            if (password === actualPassword || data == "" )
                 this.props.history.push("/users/" +username); 
             }
             else {
@@ -38,7 +28,6 @@ class Login extends Component {
         const URL = 'http://localhost:8080/users/' + username
 
         xhr.open('GET', URL)
-        // send the request
         xhr.send(URL)
     }
 
@@ -106,7 +95,7 @@ class Login extends Component {
                         variant="filled" 
                         inputProps={{style: { textAlign: 'left', fontSize: 30}}}
                         InputLabelProps={{style: {textAlign: 'left', fontSize: 30}}}
-                        onChange = {e => {updateSessionCookie("password", e.target.value);}}
+                        onChange = {e => {updateSessionCookie("password", e.target.value);}} // TODO do not store this in the session cookie
                         style = {{ top:"22vh",
                                     position:"relative",
                                     left: "20%",
@@ -118,7 +107,7 @@ class Login extends Component {
                 <Button 
                     variant="contained"
                     color = "secondary"
-                    onClick = {e => {this.handleLogin();}} // send HTTP request here
+                    onClick = {e => {this.handleLogin();}} 
                     style = {{ width:"60vh",
                                position:"relative"   ,
                                top:"30vh",     
