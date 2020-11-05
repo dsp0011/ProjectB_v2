@@ -37,7 +37,7 @@ public class Subscriber {
         Poll poll = (Poll) message.getPayload();
 
         RestTemplate restTemplate = new RestTemplate();
-        String fooResourceUrl  = "https://dweet.io/dweet/for/dat250-test2";
+        String fooResourceUrl  = "https://dweet.io/dweet/for/dat250-group6-polls";
         HttpEntity<Poll> request = new HttpEntity<>(poll);
         restTemplate.postForObject(fooResourceUrl, request, Poll.class);
     }

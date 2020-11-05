@@ -15,6 +15,7 @@ public class Publisher {
 
     public void sendMessage(Poll poll, String routing) {
         rabbitTemplate.convertAndSend("pollExchange", routing, poll);
+        //rabbitTemplate.convertAndSend("pollExchange", routing, "Hello World!");
         log.info("Message sent");
     }
 }
