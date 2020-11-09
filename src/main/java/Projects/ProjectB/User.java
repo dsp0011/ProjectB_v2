@@ -13,7 +13,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-
     @Column(unique = true)
     private String userName;
 
@@ -24,9 +23,22 @@ public class User {
     @ElementCollection
     private List<Long> idsOfPollsVotedOn;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Poll> pollsVotedOn;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Poll> pollsCreated;
+
     @ElementCollection
     private List<Long> idsOfPollsCreated;
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
     public User() {
 
     }
@@ -36,8 +48,8 @@ public class User {
         setPasswordAsHash(password);
         this.firstName = firstName;
         this.lastName = lastName;
-        this.idsOfPollsVotedOn = new ArrayList<>();
-        this.idsOfPollsCreated = new ArrayList<>();
+//        this.idsOfPollsVotedOn = new ArrayList<>();
+//        this.idsOfPollsCreated = new ArrayList<>();
     }
 
     public boolean verifyPassword(String password) {
@@ -52,13 +64,7 @@ public class User {
         this.idsOfPollsVotedOn.add(poll.getId());
     }
 
-    public long getId() {
-        return id;
-    }
 
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getUserName() {
         return userName;
@@ -92,19 +98,39 @@ public class User {
         this.lastName = lastName;
     }
 
-    public List<Long> getPollsVotedOn() {
-        return idsOfPollsVotedOn;
+
+    public List<Poll> getPollsVotedOn() {
+        return pollsVotedOn;
     }
+    public void addPollCreated(Poll pollCreated) {
+        if (this.pollsCreated == null) {
+            this.pollsCreated = new ArrayList<>();
+            this.pollsCreated.add(pollCreated);
+        } else {
+            this.pollsCreated.add(pollCreated);
+        }
+    }
+
+    public void addPollVotedOn(Poll pollVotedOn) {
+        if (this.pollsVotedOn == null) {
+            this.pollsVotedOn = new ArrayList<>();
+            this.pollsVotedOn.add(pollVotedOn);
+        } else {
+            this.pollsVotedOn.add(pollVotedOn);
+        }
+    }
+
 
     public void setPollsVotedOn(List<Long> idsOfPollsVotedOn) {
         this.idsOfPollsVotedOn = idsOfPollsVotedOn;
     }
 
-    public List<Long> getPollsCreated() {
-        return idsOfPollsCreated;
+
+    public List<Poll> getPollsCreated() {
+        return pollsCreated;
     }
 
-    public void setPollsCreated(List<Long> idsOfPollsCreated) {
+    public void setPollsCreatedID(List<Long> idsOfPollsCreated) {
         this.idsOfPollsCreated = idsOfPollsCreated;
     }
 
