@@ -1,4 +1,4 @@
-package Projects.ProjectB.websocket;
+package Projects.ProjectB.websocket.messages;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
