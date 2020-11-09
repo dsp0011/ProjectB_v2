@@ -13,6 +13,9 @@
         let stompClient = null;
 
         function connect(pollId) {
+            if (stompClient != null) {
+                disconnect(); // Only allowed to be connected to one poll at a time.
+            }
             let socket = new SockJS("/polls/connections/" + pollId);
             stompClient = Stomp.over(socket);
 
@@ -36,12 +39,11 @@
             if (stompClient != null) {
                 console.log("Client disconnected from the server");
                 stompClient.unsubscribe();
-                stompClient.unsubscribe();
-                stompClient.unsubscribe();
                 stompClient.disconnect();
                 stompClient = null;
             }
         }
+
 
         function sendMessage(message) {
             console.log("Attempting to send a message to the server");
