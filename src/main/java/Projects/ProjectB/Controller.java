@@ -1,6 +1,6 @@
 package Projects.ProjectB;
 
-import Projects.ProjectB.rabbitmq.Publisher;
+import Projects.ProjectB.messaging.Publisher;
 import Projects.ProjectB.security.PasswordRandomizer;
 import Projects.ProjectB.security.PasswordValidation;
 import org.passay.RuleResult;

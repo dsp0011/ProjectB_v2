@@ -1,4 +1,4 @@
-package Projects.ProjectB.rabbitmq;
+package Projects.ProjectB.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.*;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RabbitConfig {
+public class MessageConfig {
 
     @Bean
     public TopicExchange topicExchange() {

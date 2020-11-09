@@ -1,4 +1,4 @@
-package Projects.ProjectB.rabbitmq;
+package Projects.ProjectB.messaging;
 
 import Projects.ProjectB.Poll;
 import org.slf4j.Logger;
@@ -15,7 +15,6 @@ public class Publisher {
 
     public void sendMessage(Poll poll, String routing) {
         rabbitTemplate.convertAndSend("pollExchange", routing, poll);
-        //rabbitTemplate.convertAndSend("pollExchange", routing, "Hello World!");
         log.info("Message sent");
     }
 }

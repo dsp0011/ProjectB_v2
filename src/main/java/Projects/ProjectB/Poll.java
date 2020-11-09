@@ -1,8 +1,6 @@
 package Projects.ProjectB;
 
-import Projects.ProjectB.rabbitmq.Publisher;
 import Projects.ProjectB.time.ITimeDuration;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.util.ArrayList;
