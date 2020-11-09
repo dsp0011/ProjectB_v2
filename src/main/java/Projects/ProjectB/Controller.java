@@ -279,22 +279,12 @@ public class Controller {
 		}
 	}
 
-<<<<<<< HEAD
-	private void removeUsersConnectionToCreatedPolls(User user) {
-		// Removes foreign key constraints.
-		for (long pollId : user.getPollsCreated()) {
-			Poll poll = pollRepository.findById(pollId);
-			poll.setCreator(null);
-		}
-	}
-=======
     private void removeUsersConnectionToCreatedPolls(User user) {
 	    // Removes foreign key constraints.
         for (Poll poll: user.getPollsCreated()) {
             poll.setCreator(null);
         }
     }
->>>>>>> f09de2320ab1b8ecc97b43aac6afc91a0052160c
 
 /*
 			POLL REQUESTS
