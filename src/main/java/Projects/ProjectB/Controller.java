@@ -43,7 +43,9 @@ public class Controller {
     	String repeatPassword = "" + json.get("repeatPassword");
     	String firstName = "" + json.get("firstName");
     	String lastName = "" + json.get("lastName");
-    	// TODO: Check if firstname and lastname is empty?
+
+
+		// TODO: Check if firstname and lastname is empty?
 		Instant start = Instant.now();
     	User user = new User(userName, password, firstName, lastName);
 		Instant end = Instant.now();
@@ -141,6 +143,50 @@ public class Controller {
 		return userRepository.findByUserName(userName);
 	}
 
+
+	@PutMapping("/users/createPoll/{userName}")
+	public String updateUserPollsCreated(@PathVariable String userName, @RequestBody Map<String, String> json) {
+		String question = "" + json.get("question");
+		String alternative1 = "" + json.get("alternative1");
+		String alternative2 = "" + json.get("alternative2");
+		String timeLimit = "" + json.get("timeLimit");
+		boolean isPublic = Boolean.parseBoolean("" + json.get("public"));
+		String creatorUserName = "" + json.get("creator");
+		User creator = userRepository.findByUserName(creatorUserName);
+
+		Poll poll = new Poll(question, alternative1, alternative2,
+				timeLimit, isPublic, false, true, null);
+
+		creator.addPollCreated(poll);
+		userRepository.save(creator);
+		return "";
+
+	}
+
+	@PutMapping("/users/participatePoll/{userName}")
+	public String updateUserPollsParticipated(@PathVariable String userName, @RequestBody Map<String, String> json) {
+		int pollID = Integer.parseInt(json.get("pollID"));
+		String creatorUserName = "" + json.get("creator");
+		User creator = userRepository.findByUserName(creatorUserName);
+
+		Poll poll = pollRepository.findById(pollID);
+		creator.addPollVotedOn(poll);
+		userRepository.save(creator);
+		return "";
+
+	}
+
+//
+//	@PutMapping("/users/createPoll/{userName}")
+//	@CrossOrigin(origins = "*")
+//	public @ResponseBody User updateUserPollsCreated(@PathVariable String userName, @RequestBody User user) {
+//		System.out.println("user: " + user);
+//		User oldUser = userRepository.findByUserName(userName);
+//		oldUser.addPollCreated(user.getPollsCreated().get(0));
+//		return userRepository.save(oldUser);
+//	}
+
+
 	@PutMapping("/users/{userName}")
 	public @ResponseBody User updateUser(@PathVariable String userName,
 										 @RequestBody Map<String, String> json) {
@@ -155,6 +201,7 @@ public class Controller {
 		String repeatedNewPassword = "" + json.get("repeatedNewPassword");
 		String newFirstName = "" + json.get("newFirstName");
 		String newLastName = "" + json.get("newLastName");
+
 		updateFirstName(user, newFirstName);
 		updateLastName(user, newLastName);
 		updateUsername(user, newUserName);
@@ -230,8 +277,7 @@ public class Controller {
 
     private void removeUsersConnectionToCreatedPolls(User user) {
 	    // Removes foreign key constraints.
-        for (long pollId : user.getPollsCreated()) {
-            Poll poll = pollRepository.findById(pollId);
+        for (Poll poll: user.getPollsCreated()) {
             poll.setCreator(null);
         }
     }
@@ -249,6 +295,7 @@ public class Controller {
 		String timeLimit = "" + json.get("timeLimit");
 		boolean isPublic = Boolean.parseBoolean("" + json.get("public"));
 		String creatorUserName = "" + json.get("creator");
+
 		User creator = userRepository.findByUserName(creatorUserName);
 		if (creator == null) {
 			log.info("Creator did not exist in the database");
@@ -280,6 +327,7 @@ public class Controller {
 	}
 
 	@PutMapping("/polls/{id}")
+	@CrossOrigin(origins = "*")
 	public @ResponseBody
 	Poll updatePoll(@PathVariable long id,
 					@RequestBody Map<String, String> json) {
@@ -449,6 +497,7 @@ public class Controller {
 	 */
 
 	@PutMapping("/votes/{id}")
+	@CrossOrigin(origins = "*")
 	public @ResponseBody Poll updateVote(@PathVariable long id, @RequestBody Vote vote) {
 		log.info("Attempting to alter an existing polls vote");
 		Poll poll = pollRepository.findById(id);
