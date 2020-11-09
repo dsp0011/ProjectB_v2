@@ -36,6 +36,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     // Specify web pages that are open to all users.
                     // TODO: Update to represent actual web pages before production.
                     .antMatchers("/",
+                            "/index",
+                            "/chat",
                             "/home",
                             "/users",
                             "/polls",

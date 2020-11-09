@@ -2,14 +2,24 @@ package Projects.ProjectB;
 
 import Projects.ProjectB.security.PasswordRandomizer;
 import Projects.ProjectB.security.PasswordValidation;
+import Projects.ProjectB.websocket.OutputErrorMessage;
+import Projects.ProjectB.websocket.OutputMessage;
+import Projects.ProjectB.websocket.ValidOutputMessage;
+import Projects.ProjectB.websocket.VoteMessage;
+import org.jetbrains.annotations.NotNull;
 import org.passay.RuleResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Map;
 
 @RestController
@@ -460,8 +470,56 @@ public class Controller {
 		newVote.setAlternative1(newVote.getAlternative1() + vote.getAlternative1());
 		newVote.setAlternative2(newVote.getAlternative2() + vote.getAlternative2());
 		poll.setVote(newVote);
-
+		log.info("Updating votes for poll with id: " + id);
 		return pollRepository.save(poll);
+	}
+
+
+
+
+	@MessageMapping("/polls/connections/{pollId}")
+	@SendTo("/topic/pollWithId_{pollId}")
+	public OutputMessage send(@PathParam("pollId") String pollId,
+							VoteMessage message) throws Exception {
+		log.info("Got a message from an IoT device");
+		String time = new SimpleDateFormat("HH:mm").format(new Date());
+		try {
+			System.out.println("pollId = " + pollId);
+	//		System.out.println("message.getPollId() = " + message.getPollId());
+	//		System.out.println("message.getVotesForAlternative1() = " + message.getVotesForAlternative1());
+	//		System.out.println("message.getVotesForAlternative2() = " + message.getVotesForAlternative2());
+			Vote vote = new Vote();
+			vote.setAlternative1(message.getVotesForAlternative1());
+			vote.setAlternative2(message.getVotesForAlternative2());
+
+			log.info("Sending votes to be added");
+			Poll poll = updateVote(message.getPollId(), vote);
+			if (poll == null) {
+				log.info("Failed to add the votes to the poll");
+				throw new NullPointerException();
+			}
+			log.info("Successfully added the votes to the poll");
+			return createValidOutputMessage(message, time);
+		} catch (Exception e) {
+			return createOutputErrorMessage(time);
+		}
+	}
+
+	@NotNull
+	private OutputErrorMessage createOutputErrorMessage(String time) {
+		OutputErrorMessage errorMessage =
+				new OutputErrorMessage("Something went wrong with the message");
+		errorMessage.setTime(time);
+		return errorMessage;
+	}
+
+	@NotNull
+	private ValidOutputMessage createValidOutputMessage(VoteMessage message, String time) {
+		ValidOutputMessage outputMessage = new ValidOutputMessage(message.getPollId(),
+				message.getVotesForAlternative1(),
+				message.getVotesForAlternative2());
+		outputMessage.setTime(time);
+		return outputMessage;
 	}
 
 
