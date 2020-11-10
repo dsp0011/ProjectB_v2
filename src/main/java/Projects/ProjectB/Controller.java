@@ -1,6 +1,13 @@
 package Projects.ProjectB;
 
+import Projects.ProjectB.entities.IotDevice;
+import Projects.ProjectB.entities.Poll;
+import Projects.ProjectB.entities.User;
+import Projects.ProjectB.entities.Vote;
 import Projects.ProjectB.messaging.Publisher;
+import Projects.ProjectB.repositories.IoTDeviceRepository;
+import Projects.ProjectB.repositories.PollRepository;
+import Projects.ProjectB.repositories.UserRepository;
 import Projects.ProjectB.security.PasswordRandomizer;
 import Projects.ProjectB.security.PasswordValidation;
 import Projects.ProjectB.websocket.messages.input.InputMessage;
@@ -343,7 +350,7 @@ public class Controller {
 		Poll poll = pollRepository.findById(id);
 		if (!pollExistsInDatabase(poll)) {
 			return null;
-		} else if (!poll.getCanEdit()) {
+		} else if (!poll.isCanEdit()) {
 			boolean closePoll = Boolean.parseBoolean("" + json.get("closePoll"));
 			if (closePoll) {
 				closeThePoll(poll);
@@ -372,7 +379,7 @@ public class Controller {
 	}
 
 	private void closeThePoll(Poll poll) {
-		if (poll.getActive() && !poll.getCanEdit()) {
+		if (poll.isActive() && !poll.isCanEdit()) {
 			// Only close if poll is published and active.
 			poll.closePoll();
 			pollRepository.save(poll);
@@ -427,7 +434,7 @@ public class Controller {
 	}
 
 	private void publishThePoll(Poll poll) {
-		if (poll.getCanEdit() && !poll.getActive()) {
+		if (poll.isCanEdit() && !poll.isActive()) {
 			// Only publish the poll if it has not yet been published.
 			poll.publishPoll();
 			pollRepository.save(poll);
