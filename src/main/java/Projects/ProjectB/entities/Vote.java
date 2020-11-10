@@ -1,4 +1,7 @@
-package Projects.ProjectB;
+package Projects.ProjectB.entities;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -6,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
+@Getter
+@Setter
 public class Vote {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -16,30 +21,6 @@ public class Vote {
     public Vote() {
         this.alternative1 = 0;
         this.alternative2 = 0;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public int getAlternative1() {
-        return alternative1;
-    }
-
-    public void setAlternative1(int alternative1) {
-        this.alternative1 = alternative1;
-    }
-
-    public int getAlternative2() {
-        return alternative2;
-    }
-
-    public void setAlternative2(int alternative2) {
-        this.alternative2 = alternative2;
     }
 
     @Override
