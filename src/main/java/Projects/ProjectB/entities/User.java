@@ -2,6 +2,7 @@ package Projects.ProjectB.entities;
 
 
 import Projects.ProjectB.security.PasswordRandomizer;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +23,7 @@ public class User {
     @Column(unique = true)
     private String userName;
 
-    private String passwordAsHash;
+    @Setter(AccessLevel.NONE)private String passwordAsHash;
     private String firstName;
     private String lastName;
 
