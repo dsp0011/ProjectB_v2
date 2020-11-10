@@ -1,7 +1,10 @@
-package Projects.ProjectB;
+package Projects.ProjectB.entities;
 
 import Projects.ProjectB.time.ITimeDuration;
 import Projects.ProjectB.time.TimeDuration;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
@@ -10,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Poll {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,9 +38,6 @@ public class Poll {
 
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL)
     private List<IotDevice> iotDevices;
-
-    public Poll() {
-    }
 
     public Poll(String question, String alternative1, String alternative2,
                 String timeLimit, boolean isPublic, boolean isActive, boolean canEdit, User creator) {
@@ -111,42 +114,6 @@ public class Poll {
         return new TimeDuration(seconds).toString();
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-    public String getAlternative1() {
-        return alternative1;
-    }
-
-    public void setAlternative1(String alternative1) {
-        this.alternative1 = alternative1;
-    }
-
-    public String getAlternative2() {
-        return alternative2;
-    }
-
-    public void setAlternative2(String alternative2) {
-        this.alternative2 = alternative2;
-    }
-
-    public String getTimeLimit() {
-        return timeLimit;
-    }
-
     public void setTimeLimit(String timeLimit) {
         if (timeLimit == null
                 || timeLimit.isEmpty()
@@ -173,64 +140,12 @@ public class Poll {
         }
     }
 
-    public String getPollClosingDate() {
-        return this.pollClosingDate;
-    }
-
     public void setPollClosingDate(String pollClosingDate) {
         if (this.canEdit) {
             updatePollClosingDate();
         } else {
             this.pollClosingDate = pollClosingDate;
         }
-    }
-
-    public boolean getPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
-
-    public boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public Vote getVote() {
-        return vote;
-    }
-
-    public void setVote(Vote vote) {
-        this.vote = vote;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
-
-    public List<IotDevice> getIotDevices() {
-        return iotDevices;
-    }
-
-    public void setIotDevices(List<IotDevice> iotDevices) {
-        this.iotDevices = iotDevices;
-    }
-
-    public boolean getCanEdit() {
-        return canEdit;
-    }
-
-    public void setCanEdit(boolean canEdit) {
-        this.canEdit = canEdit;
     }
 
     @Override
