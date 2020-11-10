@@ -156,8 +156,7 @@ public class Controller {
 										 @RequestBody Map<String, String> json) {
     	log.info("Attempting to alter existing user");
 		User user = userRepository.findByUserName(userName);
-    	if (user == null) {
-    		log.info("User did not exist in the database");
+    	if (!userExistsInDatabase(user)) {
     		return null;
 		}
 		String newUserName = "" + json.get("newUserName");
@@ -225,14 +224,13 @@ public class Controller {
 	public String deleteUser(@PathVariable String userName) {
 		log.info("Attempting to delete a user");
 		User user = userRepository.findByUserName(userName);
-		if (user != null) {
+		if (userExistsInDatabase(user)) {
             removeUsersConnectionToCreatedPolls(user);
             long userId = user.getId();
 			userRepository.delete(user);
 			log.info("Successfully deleted the user with ID: " + userId);
 			return "User deleted";
 		} else {
-			log.info("User did not exist");
 			return "User was not deleted\n" +
 					"User did not exist in the database";
 		}
@@ -295,8 +293,7 @@ public class Controller {
 					@RequestBody Map<String, String> json) {
 		log.info("Attempting to alter existing poll");
 		Poll poll = pollRepository.findById(id);
-		if (poll == null) {
-			log.info("Poll did not exist in the database");
+		if (!pollExistsInDatabase(poll)) {
 			return null;
 		} else if (!poll.getCanEdit()) {
 			boolean closePoll = Boolean.parseBoolean("" + json.get("closePoll"));
@@ -392,13 +389,12 @@ public class Controller {
 	public String deletePoll(@PathVariable long id) {
 		log.info("Attempting to delete a poll");
 		Poll poll = pollRepository.findById(id);
-		if (poll != null) {
+		if (pollExistsInDatabase(poll)) {
 			long pollId = poll.getId();
 			pollRepository.delete(poll);
 			log.info("Successfully deleted the poll with ID: " + pollId);
 			return "Poll deleted";
 		} else {
-			log.info("Poll did not exist");
 			return "Poll was not deleted\n" +
 					"Poll did not exist in the database";
 		}
@@ -442,13 +438,12 @@ public class Controller {
 	public String deleteDevice(@PathVariable long id) {
 		log.info("Attempting to delete an existing IoT device");
 		IotDevice iotDevice = ioTDeviceRepository.findById(id);
-		if (iotDevice != null) {
+		if (iotDeviceExistsInDatabase(iotDevice)) {
 			long iotDeviceId = iotDevice.getId();
 			ioTDeviceRepository.delete(iotDevice);
 			log.info("Successfully deleted the IoT device with ID: " + iotDeviceId);
 			return "Device deleted";
 		} else {
-			log.info("IoT device did not exist");
 			return "Device was not deleted\n" +
 					"Device did not exist in the database";
 		}
@@ -462,8 +457,7 @@ public class Controller {
 	public @ResponseBody Poll updateVote(@PathVariable long id, @RequestBody Vote vote) {
 		log.info("Attempting to alter an existing polls vote");
 		Poll poll = pollRepository.findById(id);
-		if (poll == null) {
-			log.info("Poll did not exist");
+		if (!pollExistsInDatabase(poll)) {
 			return null;
 		}
 		Vote newVote = poll.getVote();
@@ -522,6 +516,29 @@ public class Controller {
 		return outputMessage;
 	}
 
+	private boolean pollExistsInDatabase(Poll poll) {
+		if (poll == null) {
+			log.info("Poll did not exist in the database");
+			return false;
+		}
+		return true;
+	}
+
+	private boolean userExistsInDatabase(User user) {
+		if (user == null) {
+			log.info("User did not exist in the database");
+			return false;
+		}
+		return true;
+	}
+
+	private boolean iotDeviceExistsInDatabase(IotDevice device) {
+		if (device == null) {
+			log.info("IoT device did not exist in the database");
+			return false;
+		}
+		return true;
+	}
 
 	private class AdminTools {
 		public void resetUserPassword(User user) {
