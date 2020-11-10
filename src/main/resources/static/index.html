@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Websocket Connections go here</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.js"></script>
+
+    <script type="text/javascript">
+
+
+        let stompClient = null;
+        let pollId = null;
+
+        function connect(newPollId) {
+            if (stompClient != null) {
+                disconnect(); // Only allowed to be connected to one poll at a time.
+            }
+            pollId = newPollId;
+            let socket = new SockJS("/polls/connections/" + pollId);
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function () {
+                console.log("Opened a new connection to the server");
+                const channel = "/topic/pollWithId_" + pollId;
+                stompClient.subscribe(channel, function (messageOutput) {
+                });
+                console.log("Now subscribed to channel: " + channel);
+            });
+        }
+
+        function disconnect() {
+            if (stompClient != null) {
+                console.log("Client connected to poll with ID: " + pollId
+                    + " was disconnected from the server");
+                stompClient.unsubscribe();
+                stompClient.disconnect();
+                stompClient = null;
+            }
+        }
+
+        function getTimeRemaining() {
+            console.log("Attempting to get time remaining for poll with id: " + pollId);
+            if (stompClient != null) {
+                const message = JSON.stringify({
+                    pollId: pollId,
+                    votesForAlternative1: 0,
+                    votesForAlternative2: 0,
+                    requestingToAddVotesToPoll: false,
+                    requestingTimeRemaining: true
+                });
+                stompClient.send("/app/polls/connections/" + pollId, {}, message);
+            } else {
+                console.log("Connection to server has already been terminated!");
+            }
+        }
+
+        function addVotesToPoll(message) {
+            console.log("Attempting to add votes to poll with id: " + pollId);
+            if (stompClient != null) {
+                try {
+                    const parsedMessage = JSON.parse(message);
+                    const messageToSend = JSON.stringify({
+                        pollId: pollId,
+                        votesForAlternative1: parsedMessage.votesForAlternative1,
+                        votesForAlternative2: parsedMessage.votesForAlternative2,
+                        requestingToAddVotesToPoll: true,
+                        requestingTimeRemaining: false
+                    });
+                    stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
+                } catch (e) {
+                    console.log("Something went wrong interpreting message: " + message);
+                }
+            } else {
+                console.log("Connection to server has already been terminated!");
+            }
+        }
+
+        function sendMessage(message) {
+            console.log("Attempting to send a message to the server");
+            if (stompClient != null) {
+                try {
+                    const parsedMessage = JSON.parse(message);
+                    const messageToSend = JSON.stringify({
+                        pollId: pollId,
+                        votesForAlternative1: parsedMessage.votesForAlternative1,
+                        votesForAlternative2: parsedMessage.votesForAlternative2,
+                        requestingToAddVotesToPoll: parsedMessage.requestingToAddVotesToPoll,
+                        requestingTimeRemaining: parsedMessage.requestingTimeRemaining
+                    });
+                    stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
+                } catch (e) {
+                    console.log("Something went wrong interpreting message: " + message);
+                }
+            } else {
+                console.log("Connection to server has already been terminated!");
+            }
+        }
+
+    </script>
+</head>
+<body onload="disconnect()">
+
+</body>
+</html>

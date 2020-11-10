@@ -3,14 +3,24 @@ package Projects.ProjectB;
 import Projects.ProjectB.messaging.Publisher;
 import Projects.ProjectB.security.PasswordRandomizer;
 import Projects.ProjectB.security.PasswordValidation;
+import Projects.ProjectB.websocket.messages.input.InputMessage;
+import Projects.ProjectB.websocket.messages.output.OutputErrorMessage;
+import Projects.ProjectB.websocket.messages.output.OutputMessage;
+import Projects.ProjectB.websocket.messages.output.TimeRemainingOutputMessage;
+import Projects.ProjectB.websocket.messages.output.ValidVoteOutputMessage;
+import org.jetbrains.annotations.NotNull;
 import org.passay.RuleResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Map;
 
 @RestController
@@ -47,9 +57,7 @@ public class Controller {
     	String repeatPassword = "" + json.get("repeatPassword");
     	String firstName = "" + json.get("firstName");
     	String lastName = "" + json.get("lastName");
-
-
-		// TODO: Check if firstname and lastname is empty?
+    	// TODO: Check if firstname and lastname is empty?
 		Instant start = Instant.now();
 		User user = new User(userName, password, firstName, lastName);
 		Instant end = Instant.now();
@@ -196,16 +204,14 @@ public class Controller {
 										 @RequestBody Map<String, String> json) {
 		log.info("Attempting to alter existing user");
 		User user = userRepository.findByUserName(userName);
-		if (user == null) {
-			log.info("User did not exist in the database");
-			return null;
+    	if (!userExistsInDatabase(user)) {
+    		return null;
 		}
 		String newUserName = "" + json.get("newUserName");
 		String newPassword = "" + json.get("newPassword");
 		String repeatedNewPassword = "" + json.get("repeatedNewPassword");
 		String newFirstName = "" + json.get("newFirstName");
 		String newLastName = "" + json.get("newLastName");
-
 		updateFirstName(user, newFirstName);
 		updateLastName(user, newLastName);
 		updateUsername(user, newUserName);
@@ -266,14 +272,13 @@ public class Controller {
 	public String deleteUser(@PathVariable String userName) {
 		log.info("Attempting to delete a user");
 		User user = userRepository.findByUserName(userName);
-		if (user != null) {
-			removeUsersConnectionToCreatedPolls(user);
-			long userId = user.getId();
+		if (userExistsInDatabase(user)) {
+            removeUsersConnectionToCreatedPolls(user);
+            long userId = user.getId();
 			userRepository.delete(user);
 			log.info("Successfully deleted the user with ID: " + userId);
 			return "User deleted";
 		} else {
-			log.info("User did not exist");
 			return "User was not deleted\n" +
 					"User did not exist in the database";
 		}
@@ -299,9 +304,7 @@ public class Controller {
 		String timeLimit = "" + json.get("timeLimit");
 		boolean isPublic = Boolean.parseBoolean("" + json.get("public"));
 		String creatorUserName = "" + json.get("creator");
-
 		User creator = userRepository.findByUserName(creatorUserName);
-
 		if (creator == null) {
 			log.info("Creator did not exist in the database");
 			return "Poll was not saved\n" +
@@ -327,9 +330,6 @@ public class Controller {
 	@GetMapping("/polls/{id}")
 	public @ResponseBody Poll getPoll(@PathVariable long id) {
 		log.info("Attempting to get existing poll");
-
-		Poll poll = pollRepository.findById(id);
-
 		// This returns a JSON or XML with the users
 		return pollRepository.findById(id);
 	}
@@ -341,8 +341,7 @@ public class Controller {
 					@RequestBody Map<String, String> json) {
 		log.info("Attempting to alter existing poll");
 		Poll poll = pollRepository.findById(id);
-		if (poll == null) {
-			log.info("Poll did not exist in the database");
+		if (!pollExistsInDatabase(poll)) {
 			return null;
 		} else if (!poll.getCanEdit()) {
 			boolean closePoll = Boolean.parseBoolean("" + json.get("closePoll"));
@@ -446,13 +445,12 @@ public class Controller {
 	public String deletePoll(@PathVariable long id) {
 		log.info("Attempting to delete a poll");
 		Poll poll = pollRepository.findById(id);
-		if (poll != null) {
+		if (pollExistsInDatabase(poll)) {
 			long pollId = poll.getId();
 			pollRepository.delete(poll);
 			log.info("Successfully deleted the poll with ID: " + pollId);
 			return "Poll deleted";
 		} else {
-			log.info("Poll did not exist");
 			return "Poll was not deleted\n" +
 					"Poll did not exist in the database";
 		}
@@ -496,13 +494,12 @@ public class Controller {
 	public String deleteDevice(@PathVariable long id) {
 		log.info("Attempting to delete an existing IoT device");
 		IotDevice iotDevice = ioTDeviceRepository.findById(id);
-		if (iotDevice != null) {
+		if (iotDeviceExistsInDatabase(iotDevice)) {
 			long iotDeviceId = iotDevice.getId();
 			ioTDeviceRepository.delete(iotDevice);
 			log.info("Successfully deleted the IoT device with ID: " + iotDeviceId);
 			return "Device deleted";
 		} else {
-			log.info("IoT device did not exist");
 			return "Device was not deleted\n" +
 					"Device did not exist in the database";
 		}
@@ -517,18 +514,124 @@ public class Controller {
 	public @ResponseBody Poll updateVote(@PathVariable long id, @RequestBody Vote vote) {
 		log.info("Attempting to alter an existing polls vote");
 		Poll poll = pollRepository.findById(id);
-		if (poll == null) {
-			log.info("Poll did not exist");
+		if (!pollExistsInDatabase(poll)) {
 			return null;
 		}
 		Vote newVote = poll.getVote();
 		newVote.setAlternative1(newVote.getAlternative1() + vote.getAlternative1());
 		newVote.setAlternative2(newVote.getAlternative2() + vote.getAlternative2());
 		poll.setVote(newVote);
-
+		log.info("Updating votes for poll with id: " + id);
 		return pollRepository.save(poll);
 	}
 
+	/*
+			WEBSOCKET REQUESTS
+	*/
+
+	@MessageMapping("/polls/connections/{pollId}")
+	@SendTo("/topic/pollWithId_{pollId}")
+	public OutputMessage receive(InputMessage message) {
+		log.info("Got a message from an IoT device");
+		if (message.isRequestingToAddVotesToPoll()) {
+			try {
+				return addVotesToExistingPoll(message);
+			} catch (Exception e) {
+				log.info("Something went wrong trying to add votes to existing poll");
+				return createOutputErrorMessage("Failed to add votes to poll");
+			}
+		} else if (message.isRequestingTimeRemaining()) {
+			try {
+				return pollsTimeRemaining(message);
+			} catch (Exception e) {
+				log.info("Something went wrong. Failed to calculate the time remaining");
+				return createOutputErrorMessage("Failed to get time remaining for poll");
+			}
+		} else {
+			log.info("Did nothing with the message");
+			return createOutputErrorMessage("Something went wrong. Did nothing with the message");
+		}
+	}
+
+	@NotNull
+	private OutputMessage addVotesToExistingPoll(InputMessage message) {
+		log.info("Got a request to add votes to an existing poll");
+		Vote vote = new Vote();
+		vote.setAlternative1(message.getVotesForAlternative1());
+		vote.setAlternative2(message.getVotesForAlternative2());
+
+		Poll poll = updateVote(message.getPollId(), vote);
+		if (poll == null) {
+			log.info("Failed to add the votes to the poll");
+			return createOutputErrorMessage("Failed to add votes to poll");
+		}
+		log.info("Successfully added the votes to the poll");
+		return createValidVoteOutputMessage(message);
+	}
+
+	@NotNull
+	private OutputMessage pollsTimeRemaining(InputMessage message) {
+		log.info("Got request to calculate remaining time for poll with ID: "
+				+ message.getPollId());
+		Poll poll = pollRepository.findById(message.getPollId());
+		if (!pollExistsInDatabase(poll)) {
+			return createOutputErrorMessage("Failed to get time remaining for poll");
+		}
+		String timeRemaining = poll.computeTimeRemaining();
+		log.info("Successfully calculated the time remaining");
+		return createTimeRemainingOutputMessage(timeRemaining);
+	}
+
+	@NotNull
+	private TimeRemainingOutputMessage createTimeRemainingOutputMessage(String timeRemaining) {
+		String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
+		TimeRemainingOutputMessage timeOutputMessage = new TimeRemainingOutputMessage(timeRemaining);
+		timeOutputMessage.setTime(time);
+		return timeOutputMessage;
+	}
+
+	@NotNull
+	private OutputErrorMessage createOutputErrorMessage(String message) {
+		String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
+		OutputErrorMessage errorMessage =
+				new OutputErrorMessage(message);
+		errorMessage.setTime(time);
+		return errorMessage;
+	}
+
+	@NotNull
+	private ValidVoteOutputMessage createValidVoteOutputMessage(InputMessage message) {
+		String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
+		ValidVoteOutputMessage outputMessage = new ValidVoteOutputMessage(message.getPollId(),
+				message.getVotesForAlternative1(),
+				message.getVotesForAlternative2());
+		outputMessage.setTime(time);
+		return outputMessage;
+	}
+
+	private boolean pollExistsInDatabase(Poll poll) {
+		if (poll == null) {
+			log.info("Poll did not exist in the database");
+			return false;
+		}
+		return true;
+	}
+
+	private boolean userExistsInDatabase(User user) {
+		if (user == null) {
+			log.info("User did not exist in the database");
+			return false;
+		}
+		return true;
+	}
+
+	private boolean iotDeviceExistsInDatabase(IotDevice device) {
+		if (device == null) {
+			log.info("IoT device did not exist in the database");
+			return false;
+		}
+		return true;
+	}
 
 	private class AdminTools {
 		public void resetUserPassword(User user) {

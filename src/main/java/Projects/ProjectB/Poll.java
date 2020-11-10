@@ -1,8 +1,11 @@
 package Projects.ProjectB;
 
 import Projects.ProjectB.time.ITimeDuration;
+import Projects.ProjectB.time.TimeDuration;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +22,7 @@ public class Poll {
     private boolean isPublic;
     private boolean isActive;
     private boolean canEdit; // Specify if the poll is still editable.
+
 
     @OneToOne(cascade = CascadeType.ALL)
     private Vote vote = new Vote();
@@ -91,6 +95,21 @@ public class Poll {
         }
     }
 
+    /**
+     * Compute the time between now and pollClosingDate,
+     * and return the TimeDuration.
+     *
+     * @return The time left before the poll closes as time units or "inf".
+     */
+    public String computeTimeRemaining() {
+        if (pollClosingDate.toLowerCase().equals("inf")) {
+            return "inf";
+        }
+        ZonedDateTime closingDate = ZonedDateTime.parse(pollClosingDate);
+        ZonedDateTime now = ZonedDateTime.now();
+        long seconds = ChronoUnit.SECONDS.between(now, closingDate);
+        return new TimeDuration(seconds).toString();
+    }
 
     public long getId() {
         return id;
@@ -136,7 +155,6 @@ public class Poll {
         } else {
             this.timeLimit = timeLimit;
         }
-        System.out.println();
         updatePollClosingDate();
     }
 
@@ -160,7 +178,6 @@ public class Poll {
     }
 
     public void setPollClosingDate(String pollClosingDate) {
-        System.out.println("pollClosingDate value = " + pollClosingDate);
         if (this.canEdit) {
             updatePollClosingDate();
         } else {
