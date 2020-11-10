@@ -11,11 +11,13 @@
 
 
         let stompClient = null;
+        let pollId = null;
 
-        function connect(pollId) {
+        function connect(newPollId) {
             if (stompClient != null) {
                 disconnect(); // Only allowed to be connected to one poll at a time.
             }
+            pollId = newPollId;
             let socket = new SockJS("/polls/connections/" + pollId);
             stompClient = Stomp.over(socket);
 
@@ -26,35 +28,47 @@
                 });
                 console.log("Now subscribed to channel: " + channel);
             });
-
-
-
-
-
-
-
         }
 
         function disconnect() {
             if (stompClient != null) {
-                console.log("Client disconnected from the server");
+                console.log("Client connected to poll with ID: " + pollId
+                    + " was disconnected from the server");
                 stompClient.unsubscribe();
                 stompClient.disconnect();
                 stompClient = null;
             }
         }
 
+        function getTimeRemaining() {
+            console.log("Attempting to get time remaining for poll with id: " + pollId);
+            if (stompClient != null) {
+                const message = JSON.stringify({
+                    pollId : pollId,
+                    votesForAlternative1 : 0,
+                    votesForAlternative2 : 0,
+                    requestingToAddVotesToPoll : false,
+                    requestingTimeRemaining : true
+                });
+                stompClient.send("/app/polls/connections/" + pollId, {}, message);
+            } else {
+                console.log("Connection to server has already been terminated!");
+            }
+        }
 
-        function sendMessage(message) {
-            console.log("Attempting to send a message to the server");
+        function addVotesToPoll(message) {
+            console.log("Attempting to add votes to poll with id: " + pollId);
             if (stompClient != null) {
                 try {
                     const parsedMessage = JSON.parse(message);
-                    console.log("Message: " + message);
-                    console.log("Message stringify: " + JSON.stringify(parsedMessage));
-                    const pollId = parsedMessage.pollId;
-                    console.log("pollId: " + pollId);
-                    stompClient.send("/app/polls/connections/" + pollId, {}, JSON.stringify(parsedMessage));
+                    const messageToSend = JSON.stringify({
+                        pollId: pollId,
+                        votesForAlternative1: parsedMessage.votesForAlternative1,
+                        votesForAlternative2: parsedMessage.votesForAlternative2,
+                        requestingToAddVotesToPoll: true,
+                        requestingTimeRemaining: false
+                    });
+                    stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
                 } catch (e) {
                     console.log("Something went wrong interpreting message: " + message);
                 }
@@ -62,6 +76,29 @@
                 console.log("Connection to server has already been terminated!");
             }
         }
+
+        function sendMessage(message) {
+            console.log("Attempting to send a message to the server");
+            if (stompClient != null) {
+                try {
+                    const parsedMessage = JSON.parse(message);
+                    const messageToSend = JSON.stringify({
+                        pollId : pollId,
+                        votesForAlternative1 : parsedMessage.votesForAlternative1,
+                        votesForAlternative2 : parsedMessage.votesForAlternative2,
+                        requestingToAddVotesToPoll : parsedMessage.requestingToAddVotesToPoll,
+                        requestingTimeRemaining : parsedMessage.requestingTimeRemaining
+                    });
+                    stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
+                } catch (e) {
+                    console.log("Something went wrong interpreting message: " + message);
+                }
+            } else {
+                console.log("Connection to server has already been terminated!");
+            }
+        }
+
+
 
 /*
         const ws = new WebSocket("ws://localhost:8082");
