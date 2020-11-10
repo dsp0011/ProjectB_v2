@@ -2,6 +2,7 @@ package Projects.ProjectB.entities;
 
 import Projects.ProjectB.time.ITimeDuration;
 import Projects.ProjectB.time.TimeDuration;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,8 +24,8 @@ public class Poll {
     private String question;
     private String alternative1;
     private String alternative2;
-    private String timeLimit; // The duration for how long the poll should remain active.
-    private String pollClosingDate; // The target time for when the poll should close.
+    @Setter(AccessLevel.NONE)private String timeLimit; // The duration for how long the poll should remain active.
+    @Setter(AccessLevel.NONE)private String pollClosingDate; // The target time for when the poll should close.
     private boolean isPublic;
     private boolean isActive;
     private boolean canEdit; // Specify if the poll is still editable.
