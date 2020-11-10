@@ -20,7 +20,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/polls/connections/{pollId}");
         registry.addEndpoint("/polls/connections/{pollId}")
-               // .setHandshakeHandler(new DefaultHandshakeHandler(new TomcatRequestUpgradeStrategy()))
                 .setAllowedOrigins("*")
                 .withSockJS();
     }
