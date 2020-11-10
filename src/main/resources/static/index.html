@@ -44,11 +44,11 @@
             console.log("Attempting to get time remaining for poll with id: " + pollId);
             if (stompClient != null) {
                 const message = JSON.stringify({
-                    pollId : pollId,
-                    votesForAlternative1 : 0,
-                    votesForAlternative2 : 0,
-                    requestingToAddVotesToPoll : false,
-                    requestingTimeRemaining : true
+                    pollId: pollId,
+                    votesForAlternative1: 0,
+                    votesForAlternative2: 0,
+                    requestingToAddVotesToPoll: false,
+                    requestingTimeRemaining: true
                 });
                 stompClient.send("/app/polls/connections/" + pollId, {}, message);
             } else {
@@ -83,11 +83,11 @@
                 try {
                     const parsedMessage = JSON.parse(message);
                     const messageToSend = JSON.stringify({
-                        pollId : pollId,
-                        votesForAlternative1 : parsedMessage.votesForAlternative1,
-                        votesForAlternative2 : parsedMessage.votesForAlternative2,
-                        requestingToAddVotesToPoll : parsedMessage.requestingToAddVotesToPoll,
-                        requestingTimeRemaining : parsedMessage.requestingTimeRemaining
+                        pollId: pollId,
+                        votesForAlternative1: parsedMessage.votesForAlternative1,
+                        votesForAlternative2: parsedMessage.votesForAlternative2,
+                        requestingToAddVotesToPoll: parsedMessage.requestingToAddVotesToPoll,
+                        requestingTimeRemaining: parsedMessage.requestingTimeRemaining
                     });
                     stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
                 } catch (e) {
@@ -97,26 +97,7 @@
                 console.log("Connection to server has already been terminated!");
             }
         }
-
-
-
-/*
-        const ws = new WebSocket("ws://localhost:8082");
-        ws.addEventListener("open", ev => {
-            ws.send(JSON.stringify({
-                from: "me",
-                text: "hello world!"
-            }));
-
-            //ws.send("message number 1");
-            console.log("sent a message");
-        });
-
-        ws.addEventListener("message", ev => {
-            console.log(ev.data);
-        });
-*/
-
+        
     </script>
 </head>
 <body onload="disconnect()">
