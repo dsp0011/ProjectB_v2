@@ -1,4 +1,4 @@
-package Projects.ProjectB.websocket.messages;
+package Projects.ProjectB.websocket.messages.output;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OutputErrorMessage extends OutputMessage {
+public class OutputMessage {
 
-    private String errorMessage;
+    private String time;
 }
