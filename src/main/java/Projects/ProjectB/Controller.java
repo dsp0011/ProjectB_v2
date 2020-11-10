@@ -2,10 +2,11 @@ package Projects.ProjectB;
 
 import Projects.ProjectB.security.PasswordRandomizer;
 import Projects.ProjectB.security.PasswordValidation;
-import Projects.ProjectB.websocket.OutputErrorMessage;
-import Projects.ProjectB.websocket.OutputMessage;
-import Projects.ProjectB.websocket.ValidOutputMessage;
-import Projects.ProjectB.websocket.VoteMessage;
+import Projects.ProjectB.websocket.messages.input.InputMessage;
+import Projects.ProjectB.websocket.messages.output.OutputErrorMessage;
+import Projects.ProjectB.websocket.messages.output.OutputMessage;
+import Projects.ProjectB.websocket.messages.output.TimeRemainingOutputMessage;
+import Projects.ProjectB.websocket.messages.output.ValidVoteOutputMessage;
 import org.jetbrains.annotations.NotNull;
 import org.passay.RuleResult;
 import org.slf4j.Logger;
@@ -15,7 +16,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -468,48 +468,84 @@ public class Controller {
 		return pollRepository.save(poll);
 	}
 
-
-
+	/*
+			WEBSOCKET REQUESTS
+	*/
 
 	@MessageMapping("/polls/connections/{pollId}")
 	@SendTo("/topic/pollWithId_{pollId}")
-	public OutputMessage send(@PathParam("pollId") String pollId,
-							VoteMessage message) throws Exception {
+	public OutputMessage receive(InputMessage message) {
 		log.info("Got a message from an IoT device");
-		String time = new SimpleDateFormat("HH:mm").format(new Date());
-		try {
-			System.out.println("pollId = " + pollId);
-	//		System.out.println("message.getPollId() = " + message.getPollId());
-	//		System.out.println("message.getVotesForAlternative1() = " + message.getVotesForAlternative1());
-	//		System.out.println("message.getVotesForAlternative2() = " + message.getVotesForAlternative2());
-			Vote vote = new Vote();
-			vote.setAlternative1(message.getVotesForAlternative1());
-			vote.setAlternative2(message.getVotesForAlternative2());
-
-			log.info("Sending votes to be added");
-			Poll poll = updateVote(message.getPollId(), vote);
-			if (poll == null) {
-				log.info("Failed to add the votes to the poll");
-				throw new NullPointerException();
+		if (message.isRequestingToAddVotesToPoll()) {
+			try {
+				return addVotesToExistingPoll(message);
+			} catch (Exception e) {
+				log.info("Something went wrong trying to add votes to existing poll");
+				return createOutputErrorMessage("Failed to add votes to poll");
 			}
-			log.info("Successfully added the votes to the poll");
-			return createValidOutputMessage(message, time);
-		} catch (Exception e) {
-			return createOutputErrorMessage(time);
+		} else if (message.isRequestingTimeRemaining()) {
+			try {
+				return pollsTimeRemaining(message);
+			} catch (Exception e) {
+				log.info("Something went wrong. Failed to calculate the time remaining");
+				return createOutputErrorMessage("Failed to get time remaining for poll");
+			}
+		} else {
+			log.info("Did nothing with the message");
+			return createOutputErrorMessage("Something went wrong. Did nothing with the message");
 		}
 	}
 
 	@NotNull
-	private OutputErrorMessage createOutputErrorMessage(String time) {
+	private OutputMessage addVotesToExistingPoll(InputMessage message) {
+		log.info("Got a request to add votes to an existing poll");
+		Vote vote = new Vote();
+		vote.setAlternative1(message.getVotesForAlternative1());
+		vote.setAlternative2(message.getVotesForAlternative2());
+
+		Poll poll = updateVote(message.getPollId(), vote);
+		if (poll == null) {
+			log.info("Failed to add the votes to the poll");
+			return createOutputErrorMessage("Failed to add votes to poll");
+		}
+		log.info("Successfully added the votes to the poll");
+		return createValidVoteOutputMessage(message);
+	}
+
+	@NotNull
+	private OutputMessage pollsTimeRemaining(InputMessage message) {
+		log.info("Got request to calculate remaining time for poll with ID: "
+				+ message.getPollId());
+		Poll poll = pollRepository.findById(message.getPollId());
+		if (!pollExistsInDatabase(poll)) {
+			return createOutputErrorMessage("Failed to get time remaining for poll");
+		}
+		String timeRemaining = poll.computeTimeRemaining();
+		log.info("Successfully calculated the time remaining");
+		return createTimeRemainingOutputMessage(timeRemaining);
+	}
+
+	@NotNull
+	private TimeRemainingOutputMessage createTimeRemainingOutputMessage(String timeRemaining) {
+		String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
+		TimeRemainingOutputMessage timeOutputMessage = new TimeRemainingOutputMessage(timeRemaining);
+		timeOutputMessage.setTime(time);
+		return timeOutputMessage;
+	}
+
+	@NotNull
+	private OutputErrorMessage createOutputErrorMessage(String message) {
+		String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
 		OutputErrorMessage errorMessage =
-				new OutputErrorMessage("Something went wrong with the message");
+				new OutputErrorMessage(message);
 		errorMessage.setTime(time);
 		return errorMessage;
 	}
 
 	@NotNull
-	private ValidOutputMessage createValidOutputMessage(VoteMessage message, String time) {
-		ValidOutputMessage outputMessage = new ValidOutputMessage(message.getPollId(),
+	private ValidVoteOutputMessage createValidVoteOutputMessage(InputMessage message) {
+		String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
+		ValidVoteOutputMessage outputMessage = new ValidVoteOutputMessage(message.getPollId(),
 				message.getVotesForAlternative1(),
 				message.getVotesForAlternative2());
 		outputMessage.setTime(time);
