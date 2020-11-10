@@ -16,10 +16,9 @@ public class Poll {
     private String alternative2;
     private String timeLimit; // The duration for how long the poll should remain active.
     private String pollClosingDate; // The target time for when the poll should close.
-    private Boolean isPublic;
-    private Boolean isActive;
-    private Boolean canEdit; // Specify if the poll is still editable.
-
+    private boolean isPublic;
+    private boolean isActive;
+    private boolean canEdit; // Specify if the poll is still editable.
 
     @OneToOne(cascade = CascadeType.ALL)
     private Vote vote = new Vote();
@@ -34,7 +33,7 @@ public class Poll {
     }
 
     public Poll(String question, String alternative1, String alternative2,
-                String timeLimit, Boolean isPublic, Boolean isActive, Boolean canEdit, User creator) {
+                String timeLimit, boolean isPublic, boolean isActive, boolean canEdit, User creator) {
         this.question = question;
         this.alternative1 = alternative1;
         this.alternative2 = alternative2;
@@ -137,6 +136,7 @@ public class Poll {
         } else {
             this.timeLimit = timeLimit;
         }
+        System.out.println();
         updatePollClosingDate();
     }
 
@@ -161,27 +161,26 @@ public class Poll {
 
     public void setPollClosingDate(String pollClosingDate) {
         System.out.println("pollClosingDate value = " + pollClosingDate);
-        System.out.println("canEdit = " + canEdit);
-        if (this.canEdit != null && this.canEdit) {
+        if (this.canEdit) {
             updatePollClosingDate();
         } else {
             this.pollClosingDate = pollClosingDate;
         }
     }
 
-    public Boolean getPublic() {
+    public boolean getPublic() {
         return isPublic;
     }
 
-    public void setPublic(Boolean isPublic) {
+    public void setPublic(boolean isPublic) {
         this.isPublic = isPublic;
     }
 
-    public Boolean getActive() {
+    public boolean getActive() {
         return isActive;
     }
 
-    public void setActive(Boolean isActive) {
+    public void setActive(boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -209,11 +208,11 @@ public class Poll {
         this.iotDevices = iotDevices;
     }
 
-    public Boolean getCanEdit() {
+    public boolean getCanEdit() {
         return canEdit;
     }
 
-    public void setCanEdit(Boolean canEdit) {
+    public void setCanEdit(boolean canEdit) {
         this.canEdit = canEdit;
     }
 

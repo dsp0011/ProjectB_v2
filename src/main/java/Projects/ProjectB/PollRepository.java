@@ -8,9 +8,9 @@ public interface PollRepository extends CrudRepository<Poll, Long> {
 
     Poll findById(long id);
 
-    List<Poll> findByIsPublic(Boolean isPublic);
+    List<Poll> findByIsPublic(boolean isPublic);
 
-    List<Poll> findByIsActive(Boolean isActive);
+    List<Poll> findByIsActive(boolean isActive);
 
     List<Poll> findByCreator(User creator);
 

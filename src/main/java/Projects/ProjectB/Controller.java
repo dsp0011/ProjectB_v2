@@ -1,5 +1,6 @@
 package Projects.ProjectB;
 
+import Projects.ProjectB.messaging.Publisher;
 import Projects.ProjectB.security.PasswordRandomizer;
 import Projects.ProjectB.security.PasswordValidation;
 import org.passay.RuleResult;
@@ -20,21 +21,24 @@ public class Controller {
 	final UserRepository userRepository;
 	final PollRepository pollRepository;
 	final IoTDeviceRepository ioTDeviceRepository;
+	final Publisher publisher;
 
 	@Autowired
 	public Controller(UserRepository userRepository,
 					  PollRepository pollRepository,
-					  IoTDeviceRepository ioTDeviceRepository) {
+					  IoTDeviceRepository ioTDeviceRepository,
+					  Publisher publisher) {
 		this.userRepository = userRepository;
 		this.pollRepository = pollRepository;
 		this.ioTDeviceRepository = ioTDeviceRepository;
+		this.publisher = publisher;
 	}
 
-/*
-			USER REQUESTS
- */
-    @PostMapping("/users")
-    public String createUser(@RequestBody Map<String, String> json) {
+	/*
+                USER REQUESTS
+     */
+	@PostMapping("/users")
+	public String createUser(@RequestBody Map<String, String> json) {
 		log.info("Attempting to create a new user");
 		// Concatenating request parameters with an empty
 		// string to prevent null values.
@@ -47,59 +51,59 @@ public class Controller {
 
 		// TODO: Check if firstname and lastname is empty?
 		Instant start = Instant.now();
-    	User user = new User(userName, password, firstName, lastName);
+		User user = new User(userName, password, firstName, lastName);
 		Instant end = Instant.now();
 		log.info("Hashing the users password took roughly " +
 				ChronoUnit.MILLIS.between(start, end) + " ms");
-    	return evaluateUserCredentials(user, password, repeatPassword);
-    }
+		return evaluateUserCredentials(user, password, repeatPassword);
+	}
 
-    /**
-     * Evaluate the given user credentials.
-     *
-     * @param user The user to check.
-     * @param password The password to check.
-     * @param repeatPassword The repeated password for confirmation.
-     * @return The result of the evaluation.
-     */
-    private String evaluateUserCredentials(User user, String password, String repeatPassword) {
-        log.info("Evaluating user credentials");
-        String userName = user.getUserName();
-        String result = evaluateUsername(userName);
-        if (!result.isEmpty()) {
-            return result;
-        }
-        result = evaluatePassword(password, userName);
-        if (!result.isEmpty()) {
-            return result;
-        }
-        if (password.equals(repeatPassword)) {
-            userRepository.save(user);
-            log.info("Saved user with valid password");
-            return "User saved";
-        } else {
-            log.info("Password and repeated password did not match");
-            return "User was not saved\n" +
-                    "Password and repeated password did not match";
-        }
-    }
+	/**
+	 * Evaluate the given user credentials.
+	 *
+	 * @param user The user to check.
+	 * @param password The password to check.
+	 * @param repeatPassword The repeated password for confirmation.
+	 * @return The result of the evaluation.
+	 */
+	private String evaluateUserCredentials(User user, String password, String repeatPassword) {
+		log.info("Evaluating user credentials");
+		String userName = user.getUserName();
+		String result = evaluateUsername(userName);
+		if (!result.isEmpty()) {
+			return result;
+		}
+		result = evaluatePassword(password, userName);
+		if (!result.isEmpty()) {
+			return result;
+		}
+		if (password.equals(repeatPassword)) {
+			userRepository.save(user);
+			log.info("Saved user with valid password");
+			return "User saved";
+		} else {
+			log.info("Password and repeated password did not match");
+			return "User was not saved\n" +
+					"Password and repeated password did not match";
+		}
+	}
 
-    /**
-     * Check if the password is valid.
-     *
-     * @param password The password to check.
-     * @param userName The username of the user.
-     * @return The result of the evaluation.
-     */
-    private String evaluatePassword(String password, String userName) {
-        RuleResult result = PasswordValidation.validatePassword(password, userName);
-        if (!result.isValid()) {
-            log.info("Password was not valid");
-            return "User was not saved\n" +
-                    PasswordValidation.getRuleViolations(result);
-        }
-        return ""; // Nothing wrong with the password.
-    }
+	/**
+	 * Check if the password is valid.
+	 *
+	 * @param password The password to check.
+	 * @param userName The username of the user.
+	 * @return The result of the evaluation.
+	 */
+	private String evaluatePassword(String password, String userName) {
+		RuleResult result = PasswordValidation.validatePassword(password, userName);
+		if (!result.isValid()) {
+			log.info("Password was not valid");
+			return "User was not saved\n" +
+					PasswordValidation.getRuleViolations(result);
+		}
+		return ""; // Nothing wrong with the password.
+	}
 
 	/**
 	 * Check that the username is not too long or too short,
@@ -131,14 +135,14 @@ public class Controller {
 
 	@GetMapping("/users")
 	public @ResponseBody Iterable<User> getAllUsers() {
-    	log.info("Getting all users");
+		log.info("Getting all users");
 		// This returns a JSON or XML with the users
 		return userRepository.findAll();
 	}
 
 	@GetMapping("/users/{userName}")
 	public @ResponseBody User getUser(@PathVariable String userName) {
-    	log.info("Getting specific user");
+		log.info("Getting specific user");
 		// This returns a JSON or XML with the users
 		return userRepository.findByUserName(userName);
 	}
@@ -190,11 +194,11 @@ public class Controller {
 	@PutMapping("/users/{userName}")
 	public @ResponseBody User updateUser(@PathVariable String userName,
 										 @RequestBody Map<String, String> json) {
-    	log.info("Attempting to alter existing user");
+		log.info("Attempting to alter existing user");
 		User user = userRepository.findByUserName(userName);
-    	if (user == null) {
-    		log.info("User did not exist in the database");
-    		return null;
+		if (user == null) {
+			log.info("User did not exist in the database");
+			return null;
 		}
 		String newUserName = "" + json.get("newUserName");
 		String newPassword = "" + json.get("newPassword");
@@ -263,8 +267,8 @@ public class Controller {
 		log.info("Attempting to delete a user");
 		User user = userRepository.findByUserName(userName);
 		if (user != null) {
-            removeUsersConnectionToCreatedPolls(user);
-            long userId = user.getId();
+			removeUsersConnectionToCreatedPolls(user);
+			long userId = user.getId();
 			userRepository.delete(user);
 			log.info("Successfully deleted the user with ID: " + userId);
 			return "User deleted";
@@ -297,6 +301,7 @@ public class Controller {
 		String creatorUserName = "" + json.get("creator");
 
 		User creator = userRepository.findByUserName(creatorUserName);
+
 		if (creator == null) {
 			log.info("Creator did not exist in the database");
 			return "Poll was not saved\n" +
@@ -322,6 +327,9 @@ public class Controller {
 	@GetMapping("/polls/{id}")
 	public @ResponseBody Poll getPoll(@PathVariable long id) {
 		log.info("Attempting to get existing poll");
+
+		Poll poll = pollRepository.findById(id);
+
 		// This returns a JSON or XML with the users
 		return pollRepository.findById(id);
 	}
@@ -369,6 +377,10 @@ public class Controller {
 			// Only close if poll is published and active.
 			poll.closePoll();
 			pollRepository.save(poll);
+
+			// Publish message
+			publisher.sendMessage(poll, "poll.close");
+
 			log.info("The Poll was closed");
 		} else {
 			log.info("The poll was already closed");
@@ -420,6 +432,10 @@ public class Controller {
 			// Only publish the poll if it has not yet been published.
 			poll.publishPoll();
 			pollRepository.save(poll);
+
+			// Publish message
+			publisher.sendMessage(poll, "poll.open");
+
 			log.info("The poll was published");
 		} else {
 			log.info("The poll has already been published");
