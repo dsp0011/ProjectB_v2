@@ -89,10 +89,9 @@ public class User {
         return String.format(
                 "User[Id='%d', " +
                         "userName='%s', " +
-                        "password='%s', " +
                         "firstName='%s', " +
                         "lastName='%s']",
-                id, userName, passwordAsHash, firstName, lastName
+                id, userName, firstName, lastName
         );
     }
 }
