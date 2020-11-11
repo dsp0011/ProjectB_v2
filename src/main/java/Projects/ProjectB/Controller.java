@@ -293,8 +293,9 @@ public class Controller {
 
     private void removeUsersConnectionToCreatedPolls(User user) {
 	    // Removes foreign key constraints.
-        for (Poll poll: user.getPollsCreated()) {
-            poll.setCreator(null);
+        for (long pollId : user.getIdsOfPollsCreated()) {
+            Poll poll = pollRepository.findById(pollId);
+        	poll.setCreator(null);
         }
     }
 
