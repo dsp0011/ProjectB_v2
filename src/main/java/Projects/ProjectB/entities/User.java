@@ -23,6 +23,7 @@ public class User {
     @Column(unique = true)
     private String userName;
 
+//    @JsonIgnore // Enable to prevent password from being used in output.
     @Setter(AccessLevel.NONE)private String passwordAsHash;
     private String firstName;
     private String lastName;
