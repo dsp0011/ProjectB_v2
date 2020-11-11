@@ -12,6 +12,7 @@
 
         let stompClient = null;
         let pollId = null;
+        let timer = null;
 
         function connect(newPollId) {
             if (stompClient != null) {
@@ -50,9 +51,17 @@
                     requestingToAddVotesToPoll: false,
                     requestingTimeRemaining: true
                 });
+//                timer = setInterval(sendMessage, 1000, message);
                 stompClient.send("/app/polls/connections/" + pollId, {}, message);
             } else {
                 console.log("Connection to server has already been terminated!");
+            }
+        }
+
+        function stopGetTimeRemaining() {
+            if (timer != null) {
+                console.log("Stopping time remaining requests");
+                clearInterval(timer);
             }
         }
 
