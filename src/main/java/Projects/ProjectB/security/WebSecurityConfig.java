@@ -54,11 +54,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                 .logout().permitAll(); // Logout page is open for all.
          */
-        http
+    /*    http
                 // Requires that HTTPS be used when sending requests.
                 .requiresChannel()
                 .anyRequest()
                 .requiresSecure();
+     */
     }
 
     @Bean
