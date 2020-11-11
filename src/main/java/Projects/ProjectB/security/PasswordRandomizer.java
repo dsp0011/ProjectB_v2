@@ -1,7 +1,7 @@
 package Projects.ProjectB.security;
 
-import Projects.ProjectB.User;
-import Projects.ProjectB.UserRepository;
+import Projects.ProjectB.entities.User;
+import Projects.ProjectB.repositories.UserRepository;
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;

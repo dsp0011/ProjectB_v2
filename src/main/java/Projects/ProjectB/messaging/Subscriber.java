@@ -1,6 +1,6 @@
 package Projects.ProjectB.messaging;
 
-import Projects.ProjectB.Poll;
+import Projects.ProjectB.entities.Poll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

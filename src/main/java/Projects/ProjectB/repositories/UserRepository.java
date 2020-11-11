@@ -1,5 +1,6 @@
-package Projects.ProjectB;
+package Projects.ProjectB.repositories;
 
+import Projects.ProjectB.entities.User;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
