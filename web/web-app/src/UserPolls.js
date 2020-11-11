@@ -74,7 +74,7 @@ class UserPolls extends Component {
 
     getUserPollsCreatedAsRows = () => {
         const rows = []
-        if (this.state.createdPolls != undefined) {
+        if (this.state.createdPolls !== undefined) {
             for (const entry of this.state.createdPolls) {
                 rows.push(this.createData(
                             entry.id,
@@ -145,7 +145,7 @@ class UserPolls extends Component {
     render() {
 
         {
-            if (getSessionCookie().username == this.props.match.params.username) {
+            if (getSessionCookie().username === this.props.match.params.username) {
                 return (
                     <div>
                     <Box

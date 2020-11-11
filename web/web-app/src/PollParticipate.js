@@ -28,14 +28,14 @@ class PollParticipate extends Component {
         xhr.setRequestHeader('Content-Type', 'application/json');
 
         var jsonString = "";
-        (alternative == 1) ?  jsonString = JSON.stringify( {alternative1: 1}) : jsonString = JSON.stringify( {alternative2: 1})
+        (alternative === 1) ?  jsonString = JSON.stringify( {alternative1: 1}) : jsonString = JSON.stringify( {alternative2: 1})
 
         xhr.send(jsonString)
 
     }
 
     sendUserPollVotedUpdate = () => {
-        if (getSessionCookie() == "anonymous")
+        if (getSessionCookie() === "anonymous")
             return;
         const xhr = new XMLHttpRequest()
         const pollData = this.state.poll
@@ -93,7 +93,7 @@ class PollParticipate extends Component {
 
     userCanAccessPoll = () => {
         return this.state.public
-               || !this.state.public &&  getSessionCookie() != "anonymous"
+               || !this.state.public &&  getSessionCookie() !== "anonymous"
     }
 
     render() {
@@ -121,18 +121,18 @@ class PollParticipate extends Component {
     
                     >
                         <Box
-                        bgcolor="secondary.dark" 
+                        bgcolor="secondary.dark"
                         justifyContent="center"
                         alignItems="flex-top"
                         height = "10vh"
                         width = "60vh"
-                        style = {{ 
+                        style = {{
                                 position:"absolute",
                                 borderBottom: '3px solid',
                                 background: 'linear-gradient(to right bottom, #00363a, #6d6d6d)'
-    
+
                      }}
-    
+
                     ></Box>
                         <Typography variant="h4"
                             style = {{ top:"3vh",
