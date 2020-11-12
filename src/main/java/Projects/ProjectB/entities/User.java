@@ -46,8 +46,8 @@ public class User {
         setPasswordAsHash(password);
         this.firstName = firstName;
         this.lastName = lastName;
-//        this.idsOfPollsVotedOn = new ArrayList<>();
-//        this.idsOfPollsCreated = new ArrayList<>();
+        this.idsOfPollsVotedOn = new ArrayList<>();
+        this.idsOfPollsCreated = new ArrayList<>();
     }
 
     public boolean verifyPassword(String password) {
