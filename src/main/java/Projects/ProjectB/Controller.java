@@ -583,6 +583,27 @@ public class Controller {
 		}
 	}
 
+
+	@MessageMapping("/polls/connections/{pollId}/timeRemaining")
+	@SendTo("/topic/pollWithId_{pollId}/timeRemaining")
+	public OutputMessage receiveTimeRemainingRequest(InputMessage message) {
+		try {
+			return pollsTimeRemaining(message);
+		} catch (Exception e) {
+			log.info("Something went wrong. Failed to calculate the time remaining");
+			return createOutputErrorMessage("Failed to get time remaining for poll");
+		}
+	}
+
+
+
+
+
+
+
+
+
+
 	@NotNull
 	private OutputMessage addVotesToExistingPoll(InputMessage message) {
 		log.info("Got a request to add votes to an existing poll");

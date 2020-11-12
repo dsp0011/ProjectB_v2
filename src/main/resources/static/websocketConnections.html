@@ -14,7 +14,7 @@
         let pollId = null;
         let timer = null;
 
-        function connect(newPollId) {
+        function connect(newPollId, timeUpdates, voteUpdates) {
             if (stompClient != null) {
                 disconnect(); // Only allowed to be connected to one poll at a time.
             }
@@ -27,6 +27,18 @@
                 const channel = "/topic/pollWithId_" + pollId;
                 stompClient.subscribe(channel, function (messageOutput) {
                 });
+                if (timeUpdates === true) {
+                    const channelForTimeUpdates = channel + "/timeRemaining";
+                    stompClient.subscribe(channelForTimeUpdates, function (messageOutput) {
+                    });
+                    console.log("Now subscribed to channel for time remaining");
+                }
+                if (voteUpdates === true) {
+                    const channelForVoteUpdates = channel + "/voteUpdates";
+                    stompClient.subscribe(channelForVoteUpdates, function (messageOutput) {
+                    });
+                    console.log("Now subscribed to channel for vote updates");
+                }
                 console.log("Now subscribed to channel: " + channel);
             });
         }
@@ -53,7 +65,7 @@
                     requestingNumberOfVotes: false
                 });
 //                timer = setInterval(sendMessage, 1000, message);
-                stompClient.send("/app/polls/connections/" + pollId, {}, message);
+                stompClient.send("/app/polls/connections/" + pollId + "/timeRemaining", {}, message);
             } else {
                 console.log("Connection to server has already been terminated!");
             }
