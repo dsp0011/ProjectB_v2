@@ -596,7 +596,7 @@ public class Controller {
 			return createOutputErrorMessage("Failed to add votes to poll");
 		}
 		log.info("Successfully added the votes to the poll");
-		return createValidVoteOutputMessage(message);
+		return createVotesOnPollOutputMessage(poll.getVote()); //createValidVoteOutputMessage(message);
 	}
 
 	@NotNull
