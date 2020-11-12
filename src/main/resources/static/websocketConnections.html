@@ -49,7 +49,8 @@
                     votesForAlternative1: 0,
                     votesForAlternative2: 0,
                     requestingToAddVotesToPoll: false,
-                    requestingTimeRemaining: true
+                    requestingTimeRemaining: true,
+                    requestingNumberOfVotes: false
                 });
 //                timer = setInterval(sendMessage, 1000, message);
                 stompClient.send("/app/polls/connections/" + pollId, {}, message);
@@ -75,7 +76,8 @@
                         votesForAlternative1: parsedMessage.votesForAlternative1,
                         votesForAlternative2: parsedMessage.votesForAlternative2,
                         requestingToAddVotesToPoll: true,
-                        requestingTimeRemaining: false
+                        requestingTimeRemaining: false,
+                        requestingNumberOfVotes: false
                     });
                     stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
                 } catch (e) {
@@ -113,7 +115,8 @@
                         votesForAlternative1: parsedMessage.votesForAlternative1,
                         votesForAlternative2: parsedMessage.votesForAlternative2,
                         requestingToAddVotesToPoll: parsedMessage.requestingToAddVotesToPoll,
-                        requestingTimeRemaining: parsedMessage.requestingTimeRemaining
+                        requestingTimeRemaining: parsedMessage.requestingTimeRemaining,
+                        requestingNumberOfVotes: parsedMessage.requestingNumberOfVotes
                     });
                     stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
                 } catch (e) {
