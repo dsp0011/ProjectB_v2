@@ -14,7 +14,7 @@
         let pollId = null;
         let timer = null;
 
-        function connect(newPollId, timeUpdates, voteUpdates) {
+        function connect(newPollId, blockAllUpdates = false, timeUpdates = true, voteUpdates = true) {
             if (stompClient != null) {
                 disconnect(); // Only allowed to be connected to one poll at a time.
             }
@@ -24,22 +24,26 @@
 
             stompClient.connect({}, function () {
                 console.log("Opened a new connection to the server");
-                const channel = "/topic/pollWithId_" + pollId;
-                stompClient.subscribe(channel, function (messageOutput) {
-                });
-                if (timeUpdates === true) {
-                    const channelForTimeUpdates = channel + "/timeRemaining";
-                    stompClient.subscribe(channelForTimeUpdates, function (messageOutput) {
+                if (blockAllUpdates === true) {
+                    console.log("Not subscribed to any channel");
+                } else {
+                    const channel = "/topic/pollWithId_" + pollId;
+                    stompClient.subscribe(channel, function (messageOutput) {
                     });
-                    console.log("Now subscribed to channel for time remaining");
+                    console.log("Now subscribed to main channel: " + channel);
+                    if (timeUpdates === true) {
+                        const channelForTimeUpdates = channel + "/timeRemaining";
+                        stompClient.subscribe(channelForTimeUpdates, function (messageOutput) {
+                        });
+                        console.log("Now subscribed to channel for time remaining: " + channelForTimeUpdates);
+                    }
+                    if (voteUpdates === true) {
+                        const channelForVoteUpdates = channel + "/voteUpdates";
+                        stompClient.subscribe(channelForVoteUpdates, function (messageOutput) {
+                        });
+                        console.log("Now subscribed to channel for vote updates: " + channelForVoteUpdates);
+                    }
                 }
-                if (voteUpdates === true) {
-                    const channelForVoteUpdates = channel + "/voteUpdates";
-                    stompClient.subscribe(channelForVoteUpdates, function (messageOutput) {
-                    });
-                    console.log("Now subscribed to channel for vote updates");
-                }
-                console.log("Now subscribed to channel: " + channel);
             });
         }
 
@@ -91,7 +95,7 @@
                         requestingTimeRemaining: false,
                         requestingNumberOfVotes: false
                     });
-                    stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
+                    stompClient.send("/app/polls/connections/" + pollId + "/votes", {}, messageToSend);
                 } catch (e) {
                     console.log("Something went wrong interpreting message: " + message);
                 }
@@ -111,7 +115,7 @@
                     requestingTimeRemaining: false,
                     requestingNumberOfVotes: true
                 });
-                stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
+                stompClient.send("/app/polls/connections/" + pollId + "/currentVotes", {}, messageToSend);
             } else {
                 console.log("Connection to server has already been terminated!");
             }

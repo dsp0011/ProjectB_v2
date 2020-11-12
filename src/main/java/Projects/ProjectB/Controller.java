@@ -583,7 +583,6 @@ public class Controller {
 		}
 	}
 
-
 	@MessageMapping("/polls/connections/{pollId}/timeRemaining")
 	@SendTo("/topic/pollWithId_{pollId}/timeRemaining")
 	public OutputMessage receiveTimeRemainingRequest(InputMessage message) {
@@ -595,14 +594,27 @@ public class Controller {
 		}
 	}
 
+	@MessageMapping("/polls/connections/{pollId}/votes")
+	@SendTo("/topic/pollWithId_{pollId}/voteUpdates")
+	public OutputMessage receiveAddVotesToPollRequest(InputMessage message) {
+		try {
+			return addVotesToExistingPoll(message);
+		} catch (Exception e) {
+			log.info("Something went wrong trying to add votes to existing poll");
+			return createOutputErrorMessage("Failed to add votes to poll");
+		}
+	}
 
-
-
-
-
-
-
-
+	@MessageMapping("/polls/connections/{pollId}/currentVotes")
+	@SendTo("/topic/pollWithId_{pollId}/voteUpdates")
+	public OutputMessage receiveGetVotesFromPollRequest(InputMessage message) {
+		try {
+			return getVotesFromPoll(message);
+		} catch (Exception e) {
+			log.info("Something went wrong. Failed to get votes from the poll");
+			return createOutputErrorMessage("Failed to retrieve votes from poll");
+		}
+	}
 
 	@NotNull
 	private OutputMessage addVotesToExistingPoll(InputMessage message) {
