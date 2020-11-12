@@ -86,6 +86,23 @@
             }
         }
 
+        function getVotesForPoll() {
+            console.log("Attempting to get votes on poll with id: " + pollId);
+            if (stompClient != null) {
+                const messageToSend = JSON.stringify({
+                    pollId: pollId,
+                    votesForAlternative1: 0,
+                    votesForAlternative2: 0,
+                    requestingToAddVotesToPoll: false,
+                    requestingTimeRemaining: false,
+                    requestingNumberOfVotes: true
+                });
+                stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
+            } else {
+                console.log("Connection to server has already been terminated!");
+            }
+        }
+
         function sendMessage(message) {
             console.log("Attempting to send a message to the server");
             if (stompClient != null) {
