@@ -11,10 +11,7 @@ import Projects.ProjectB.repositories.UserRepository;
 import Projects.ProjectB.security.PasswordRandomizer;
 import Projects.ProjectB.security.PasswordValidation;
 import Projects.ProjectB.websocket.messages.input.InputMessage;
-import Projects.ProjectB.websocket.messages.output.OutputErrorMessage;
-import Projects.ProjectB.websocket.messages.output.OutputMessage;
-import Projects.ProjectB.websocket.messages.output.TimeRemainingOutputMessage;
-import Projects.ProjectB.websocket.messages.output.ValidVoteOutputMessage;
+import Projects.ProjectB.websocket.messages.output.*;
 import org.jetbrains.annotations.NotNull;
 import org.passay.RuleResult;
 import org.slf4j.Logger;
@@ -573,6 +570,13 @@ public class Controller {
 				log.info("Something went wrong. Failed to calculate the time remaining");
 				return createOutputErrorMessage("Failed to get time remaining for poll");
 			}
+		} else if (message.isRequestingNumberOfVotes()) {
+			try {
+				return getVotesFromPoll(message);
+			} catch (Exception e) {
+				log.info("Something went wrong. Failed to get votes from the poll");
+				return createOutputErrorMessage("Failed to retrieve votes from poll");
+			}
 		} else {
 			log.info("Did nothing with the message");
 			return createOutputErrorMessage("Something went wrong. Did nothing with the message");
@@ -606,6 +610,32 @@ public class Controller {
 		String timeRemaining = poll.computeTimeRemaining();
 		log.info("Successfully calculated the time remaining");
 		return createTimeRemainingOutputMessage(timeRemaining);
+	}
+
+	@NotNull
+	private OutputMessage getVotesFromPoll(InputMessage message) {
+		log.info("Got request to fetch number of votes for poll with id: "
+				+ message.getPollId());
+		Poll poll = pollRepository.findById(message.getPollId());
+		if (!pollExistsInDatabase(poll)) {
+			log.info("Failed to retrieve votes from the poll");
+			return createOutputErrorMessage("Failed to retrieve votes from poll");
+		}
+		Vote votes = poll.getVote();
+		VotesOnPollOutputMessage message1 = createVotesOnPollOutputMessage(votes);
+		log.info("Successfully retrieved votes from the poll");
+		return message1;
+	}
+
+	@NotNull
+	private VotesOnPollOutputMessage createVotesOnPollOutputMessage(Vote votes) {
+		String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
+		VotesOnPollOutputMessage votesOnPollOutputMessage = new VotesOnPollOutputMessage(
+				votes.getAlternative1(),
+				votes.getAlternative2()
+		);
+		votesOnPollOutputMessage.setTime(time);
+		return votesOnPollOutputMessage;
 	}
 
 	@NotNull

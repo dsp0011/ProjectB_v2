@@ -16,4 +16,5 @@ public class InputMessage {
     private int votesForAlternative2;
     private boolean requestingToAddVotesToPoll;
     private boolean requestingTimeRemaining;
+    private boolean requestingNumberOfVotes;
 }
