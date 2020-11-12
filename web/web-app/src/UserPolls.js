@@ -157,7 +157,7 @@ class UserPolls extends Component {
                 {rows.map((row) => (
                     <TableRow
                     onMouseDown = {e =>{ this.sendCloseRequest(e)}}
-                    // onMouseDown = {e =>{ this.props.history.push("../../edit/" + row.pollID)}}
+                    onMouseDown = {e =>{ this.props.history.push("../../edit/" + row.pollID)}}
                     key={row.pollID}>
                     <TableCell component="th" scope="row">
                         {row.pollID}

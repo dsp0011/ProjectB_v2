@@ -22,6 +22,8 @@ class PollParticipate extends Component {
 
   
     sendVoteUpdate = (alternative) => {
+        if (getSessionCookie().username === "anonymous")
+            return
         const xhr = new XMLHttpRequest()
         const URL = 'http://localhost:8080/votes/' + this.props.match.params.pollID
 
@@ -37,22 +39,21 @@ class PollParticipate extends Component {
     }
 
     sendUserPollVotedUpdate = () => {
-        if (getSessionCookie() == "anonymous")
-            return;
-        const xhr = new XMLHttpRequest()
-        const pollData = this.state.poll
-        pollData.public = this.state.public
 
-        const URL = 'http://localhost:8080/polls/vote/' + getSessionCookie().username
-        // const URL = 'http://localhost:8080/users/participatePoll/' + getSessionCookie().username
-        xhr.open('PUT', URL)
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        //create JSON string reqeust
-        const jsonString = JSON.stringify({pollID: this.state.pollID})
-        console.log("URL: ", URL)
-        console.log("jsonString ", jsonString)
-        // send the request
-        xhr.send(jsonString)
+            const xhr = new XMLHttpRequest()
+            const pollData = this.state.poll
+            pollData.public = this.state.public
+
+            const URL = 'http://localhost:8080/polls/vote/' + getSessionCookie().username
+            // const URL = 'http://localhost:8080/users/participatePoll/' + getSessionCookie().username
+            xhr.open('PUT', URL)
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            //create JSON string reqeust
+            const jsonString = JSON.stringify({pollID: this.state.pollID})
+            console.log("URL: ", URL)
+            console.log("jsonString ", jsonString)
+            // send the request
+            xhr.send(jsonString)
     }
 
 
@@ -155,11 +156,13 @@ class PollParticipate extends Component {
                         width = "60vh"
                         style = {{ border: '3px solid',
                                 position:"absolute"   ,
+                                background: 'linear-gradient(to right bottom, #d7ccc8, #a69b97)'
+
                      }}
     
                     >
                         <Box
-                        bgcolor="secondary.dark" 
+                        bgcolor="secondary.main" 
                         justifyContent="center"
                         alignItems="flex-top"
                         height = "10vh"
@@ -167,8 +170,6 @@ class PollParticipate extends Component {
                         style = {{ 
                                 position:"absolute",
                                 borderBottom: '3px solid',
-                                background: 'linear-gradient(to right bottom, #00363a, #6d6d6d)'
-    
                      }}
     
                     ></Box>
@@ -227,7 +228,7 @@ class PollParticipate extends Component {
                         component={Link}
                         variant="contained"
                         color = "secondary"
-                        // to = {"../view/" + this.props.match.params.pollID}
+                        to = {"../view/" + this.props.match.params.pollID}
                         onClick = {e => {this.sendVoteUpdate(1); this.sendUserPollVotedUpdate()}}
                         style = {{ width:"27vh",
                                    right: "-13vh",
@@ -240,7 +241,7 @@ class PollParticipate extends Component {
                         component={Link}
                         variant="contained"
                         color = "secondary"
-                        // to = {"../view/" + this.props.match.params.pollID}
+                        to = {"../view/" + this.props.match.params.pollID}
                         onClick = {e => {this.sendVoteUpdate(2); this.sendUserPollVotedUpdate()}}
                         style = {{ width:"27vh",
                                    left: "14vh",

@@ -63,7 +63,6 @@ class Login extends Component {
                     style = {{ 
                             position:"absolute",
                             borderBottom: '3px solid',
-                            background: 'linear-gradient(to right bottom, #00363a, #6d6d6d)'
 
                  }}
 

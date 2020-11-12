@@ -24,6 +24,20 @@ class PollCreate extends Component {
     // this.addUserCreatedPoll(); this.createPoll()
     componentDidMount() {
     }
+
+    publishPoll = (pollID) => {
+
+        const xhr = new XMLHttpRequest()
+        const URL = 'http://localhost:8080/polls/' + pollID
+        xhr.open('PUT', URL)
+        xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        //create JSON string reqeust
+        const jsonString = JSON.stringify({publishPoll : "true"})
+        console.log("sending ", jsonString)
+        // send the request
+        xhr.send(jsonString)
+    }
     
     addUserCreatedPoll = () => {
         const xhr = new XMLHttpRequest()
@@ -63,7 +77,12 @@ class PollCreate extends Component {
 
         const xhr = new XMLHttpRequest()
         xhr.addEventListener('load', () => {
+            
+            const data = xhr.responseText
+            const jsonResponse = JSON.parse(data)
+            console.log("poll id: ", jsonResponse)
             this.addUserCreatedPoll();
+            this.publishPoll(jsonResponse);
         })
         const pollData = this.makePollJSON()
         const URL = 'http://localhost:8080/polls/'
@@ -103,11 +122,13 @@ class PollCreate extends Component {
                         width = "60vh"
                         style = {{ border: '3px solid',
                                 position:"absolute"   ,
+                            background: 'linear-gradient(to right bottom, #d7ccc8, #a69b97)'
+
                      }}
     
                     >
                         <Box
-                        bgcolor="secondary.dark" 
+                        bgcolor="secondary.main" 
                         justifyContent="center"
                         alignItems="flex-top"
                         height = "10vh"
@@ -115,7 +136,6 @@ class PollCreate extends Component {
                         style = {{ 
                                 position:"absolute",
                                 borderBottom: '3px solid',
-                                background: 'linear-gradient(to right bottom, #00363a, #6d6d6d)'
     
                      }}
     

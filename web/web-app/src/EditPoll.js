@@ -48,7 +48,7 @@ class EditPoll extends Component {
                         optionAVotes: jsonResponse["vote"]["alternative1"],
                         optionBVotes: jsonResponse["vote"]["alternative2"],
                         timeLimit: jsonResponse["timeLimit"],
-                        checked: jsonResponse["public"]
+                        checked: jsonResponse["public"],
                     })
                 
             
@@ -74,6 +74,7 @@ class EditPoll extends Component {
                 creator:getSessionCookie().username,
                 timeLimit : this.state.timeLimit,
                 public : this.state.public,
+                active: "true",
             }
         )
 

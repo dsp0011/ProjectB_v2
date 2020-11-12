@@ -313,7 +313,7 @@ public class Controller {
 			creator.createdANewPoll(poll);
 			userRepository.save(creator);
 			log.info("Poll was created successfully");
-			return "Poll saved";
+			return Long.toString(poll.getId());
 		}
 	}
 
