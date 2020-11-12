@@ -52,14 +52,19 @@ class PollParticipate extends Component {
     makePollJSON = () => {
         return (
             {
+                pollID : this.state.pollID
+
+
+
+                /*
                 question : this.state.question,
                 pollID : this.state.pollID,
                 alternative1 :this.state.optionA,
                 alternative2 :this.state.optionB,
                 creator:getSessionCookie().username,
                 timeLimit : this.state.timeLimit,
-                public : this.state.public,
-
+                public : this.state.public
+                 */
             }
         )
 

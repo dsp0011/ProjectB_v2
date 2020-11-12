@@ -15,7 +15,7 @@ class Login extends Component {
 
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
-            if (data != "") {
+            if (data !== "") {
                 const jsonResponse = JSON.parse(data)
                 const actualPassword = jsonResponse.password
                 this.props.history.push("/users/" +username); 
