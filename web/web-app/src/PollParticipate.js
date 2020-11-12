@@ -5,6 +5,8 @@ import TextField from '@material-ui/core/TextField';
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
 import { getSessionCookie } from './Session';
+import Countdown from "react-countdown";
+
 class PollParticipate extends Component {
 
 
@@ -40,13 +42,33 @@ class PollParticipate extends Component {
         const xhr = new XMLHttpRequest()
         const pollData = this.state.poll
         pollData.public = this.state.public
-        const URL = 'http://localhost:8080/users/participatePoll/' + getSessionCookie().username
+
+        const URL = 'http://localhost:8080/polls/vote/' + getSessionCookie().username
+        // const URL = 'http://localhost:8080/users/participatePoll/' + getSessionCookie().username
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Content-Type', 'application/json');
         //create JSON string reqeust
-        const jsonString = JSON.stringify(this.makePollJSON())
+        const jsonString = JSON.stringify({pollID: this.state.pollID})
+        console.log("URL: ", URL)
+        console.log("jsonString ", jsonString)
         // send the request
         xhr.send(jsonString)
+    }
+
+
+    getTimeRemaining = () => {
+        const pollClosingDate = new Date(this.state.pollClosingDate.substring(0,19))
+
+
+    
+        const today = new Date();
+        const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        const dateTime = new Date(date+'T'+time);
+        const diff = pollClosingDate - today
+        if (diff !== undefined) {
+            this.setState({"timeRemaining" : diff})
+        }
     }
 
     makePollJSON = () => {
@@ -72,13 +94,17 @@ class PollParticipate extends Component {
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
             this.setState({question: jsonResponse["question"],
-                        optionA: jsonResponse["alternative1"],
-                        optionB: jsonResponse["alternative2"],
-                        timeLimit: jsonResponse["timeLimit"],
-                        public: jsonResponse["public"],
-                        poll : jsonResponse,
-                        pollID : jsonResponse["id"]
-                    })
+                optionA: jsonResponse["alternative1"],
+                optionB: jsonResponse["alternative2"],
+                timeLimit: jsonResponse["timeLimit"],
+                public: jsonResponse["public"],
+                poll : jsonResponse,
+                pollID : jsonResponse["id"],
+                pollClosingDate: jsonResponse["pollClosingDate"]
+                
+            })
+            this.getTimeRemaining()
+            
         })
         const URL = 'http://localhost:8080/polls/' + pollID
 
@@ -89,12 +115,24 @@ class PollParticipate extends Component {
 
     componentDidMount() {
         this.getPollData(this.props.match.params.pollID); 
+
     }
 
     userCanAccessPoll = () => {
         return this.state.public
                || !this.state.public &&  getSessionCookie() != "anonymous"
     }
+
+    getTimeRemainingText = () => {
+        if (this.state.timeRemaining == undefined || this.state.timeRemaining == 0)
+            return "inf"
+        else {
+            return(                        
+                 <Countdown 
+                date={Date.now() + this.state.timeRemaining} />
+                )
+            }
+        }
 
     render() {
         if (this.userCanAccessPoll()) {
@@ -189,10 +227,10 @@ class PollParticipate extends Component {
                         component={Link}
                         variant="contained"
                         color = "secondary"
-                        to = {"../view/" + this.props.match.params.pollID}
+                        // to = {"../view/" + this.props.match.params.pollID}
                         onClick = {e => {this.sendVoteUpdate(1); this.sendUserPollVotedUpdate()}}
                         style = {{ width:"27vh",
-                                   right: "-9vh",
+                                   right: "-13vh",
                                    position:"relative"   ,
                                    top:"25vh",     
                                 }}
@@ -202,22 +240,24 @@ class PollParticipate extends Component {
                         component={Link}
                         variant="contained"
                         color = "secondary"
-                        to = {"../view/" + this.props.match.params.pollID}
+                        // to = {"../view/" + this.props.match.params.pollID}
                         onClick = {e => {this.sendVoteUpdate(2); this.sendUserPollVotedUpdate()}}
                         style = {{ width:"27vh",
-                                   left: "10vh",
+                                   left: "14vh",
                                    position:"relative"   ,
                                    top:"25vh",     
                                 }}
                     >Vote Option B
                     </Button>
+
                     <Typography variant="h6"
                             style = {{ top:"16vh",
-                                       right: "42vh",
+                                       right: "38vh",
                                         position:"relative",
                              }}
                         >
-                        Time Remaining:  {this.state.timeLimit}
+                        Time Remaining:  {this.getTimeRemainingText()}                      
+
                         </Typography>
     
                 </Box>,

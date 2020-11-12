@@ -6,6 +6,7 @@ import Register from './Register.js';
 import PollParticipate from './PollParticipate.js';
 import PollCreate from './PollCreate.js';
 import ViewPoll from './ViewPoll.js';
+import EditPoll from './EditPoll.js';
 import UserPolls from './UserPolls.js'
 import { SessionContext, getSessionCookie, setSessionCookie } from "./Session.js";
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
@@ -24,6 +25,9 @@ function App() {
               <Route path='/users/:username/' component={UserPolls} />
               <Route path='/polls/vote/:pollID' component={PollParticipate}/>
               <Route path='/create/' component={PollCreate}/>
+              <Route path='/edit/:pollID' component={EditPoll}/>
+
+              
           </Switch>
       </Router>
     </SessionContext.Provider>

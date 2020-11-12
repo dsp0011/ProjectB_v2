@@ -8,7 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
 import { getSessionCookie } from './Session';
-class PollCreate extends Component {
+class EditPoll extends Component {
 
 
 
@@ -20,17 +20,11 @@ class PollCreate extends Component {
                       timeLimit: "inf",
                       public: false}
     }
-
-    // this.addUserCreatedPoll(); this.createPoll()
-    componentDidMount() {
-    }
-    
     addUserCreatedPoll = () => {
         const xhr = new XMLHttpRequest()
         const pollData = this.makePollJSON()
         const URL = 'http://localhost:8080/users/createPoll/' + getSessionCookie().username
         
-
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Content-type', 'application/json')
         
@@ -39,12 +33,44 @@ class PollCreate extends Component {
         // send the request
         xhr.send(jsonString)
     }
+
+    getPollData = (pollID) => {
+        const xhr = new XMLHttpRequest()
+
+        xhr.addEventListener('load', () => {
+            const data = xhr.responseText
+            const jsonResponse = JSON.parse(data)
+            console.log("jsonResponse", jsonResponse)
+            this.setState({question: jsonResponse["question"],
+                        optionA: jsonResponse["alternative1"],
+                        optionB: jsonResponse["alternative2"],
+                        timeLimit: jsonResponse["timeLimit"],
+                        optionAVotes: jsonResponse["vote"]["alternative1"],
+                        optionBVotes: jsonResponse["vote"]["alternative2"],
+                        timeLimit: jsonResponse["timeLimit"],
+                        checked: jsonResponse["public"]
+                    })
+                
+            
+        })
+        const URL = 'http://localhost:8080/polls/' + pollID
+
+        xhr.open('GET', URL)
+        xhr.send(URL)
+    }
+
+
+    componentDidMount() {
+        this.getPollData(this.props.match.params.pollID);
+    }
+    
+
     makePollJSON = () => {
         return (
             {
                 question : this.state.question,
                 alternative1 :this.state.optionA,
-                alternative2 :this.state.optionB,
+                alternative2 :this.state.optionB, 
                 creator:getSessionCookie().username,
                 timeLimit : this.state.timeLimit,
                 public : this.state.public,
@@ -59,19 +85,19 @@ class PollCreate extends Component {
             this.setState({public : true})
 
     }
-    createPoll = () => {
+    updatePoll = () => {
 
         const xhr = new XMLHttpRequest()
-        xhr.addEventListener('load', () => {
-            this.addUserCreatedPoll();
-        })
+
         const pollData = this.makePollJSON()
-        const URL = 'http://localhost:8080/polls/'
-        xhr.open('POST', URL)
+        const URL = 'http://localhost:8080/polls/' + this.props.match.params.pollID
+        console.log("URL", URL)
+        xhr.open('PUT', URL)
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
         xhr.setRequestHeader('Content-Type', 'application/json');
         //create JSON string reqeust
         const jsonString = JSON.stringify(pollData)
+        console.log("sending ", jsonString)
         // send the request
         xhr.send(jsonString)
     }
@@ -132,6 +158,8 @@ class PollCreate extends Component {
                         <TextField 
                             id="outlined-basic" 
                             label="Question" 
+                            defaultValue={this.state.question}
+                            value = {this.state.question}
                             variant="filled" 
                             inputProps={{ style: { textAlign: 'left', fontSize: 20}}}
                             InputLabelProps={{style: {textAlign: 'center', fontSize: 35}}}
@@ -143,7 +171,9 @@ class PollCreate extends Component {
                         />
                         <TextField 
                             id="outlined-basic" 
-                            label="Option A" 
+                            label="Option A"
+                            defaultValue={this.state.optionA}
+                            value = {this.state.optionA} 
                             variant="outlined" 
                             inputProps={{ style: { textAlign: 'left', fontSize: 20}}}
                             InputLabelProps={{style: {textAlign: 'center', fontSize: 20}}}
@@ -155,7 +185,9 @@ class PollCreate extends Component {
                         />
                         <TextField 
                             id="outlined-basic" 
-                            label="Option B" 
+                            label="Option B"
+                            defaultValue={this.state.optionB}
+                            value = {this.state.optionB} 
                             variant="outlined" 
                             inputProps={{ style: {textAlign: 'left', fontSize: 20}}}
                             InputLabelProps={{style: {textAlign: 'left', fontSize: 20}}}
@@ -168,7 +200,9 @@ class PollCreate extends Component {
                         />
                         <TextField 
                             id="outlined-basic" 
-                            label="Time limit" 
+                            label="Time limit"
+                            defaultValue={this.state.timeLimit}
+                            value = {this.state.timeLimit}  
                             variant="outlined" 
                             inputProps={{ style: { textAlign: 'left', fontSize: 20}}}
                             InputLabelProps={{style: {textAlign: 'center', fontSize: 20}}}
@@ -195,14 +229,14 @@ class PollCreate extends Component {
                         component={Link}
                         variant="contained"
                         color = "secondary"
-                        to = {"../users/" + getSessionCookie().username}
-                        onClick = {e => {this.createPoll();}} // send HTTP request here
+                        // to = {"../users/" + getSessionCookie().username}
+                        onClick = {e => {this.updatePoll(); this.addUserCreatedPoll();}} // send HTTP request here
                         style = {{ width:"27vh",
                                    position:"relative"   ,
                                    top:"25vh",
                                    right:"5vh"     
                                 }}
-                    >Publish poll
+                    >Edit
                     </Button>
  
 
@@ -221,4 +255,4 @@ class PollCreate extends Component {
 }
 
 
-export default PollCreate;
+export default EditPoll;

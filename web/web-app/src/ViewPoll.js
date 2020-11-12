@@ -84,7 +84,8 @@ class ViewPoll extends Component {
                         optionB: jsonResponse["alternative2"],
                         timeLimit: jsonResponse["timeLimit"],
                         optionAVotes: jsonResponse["vote"]["alternative1"],
-                        optionBVotes: jsonResponse["vote"]["alternative2"]
+                        optionBVotes: jsonResponse["vote"]["alternative2"],
+                        pollClosingDate: jsonResponse["pollClosingDate"]
                     })
                 
             
@@ -99,6 +100,7 @@ class ViewPoll extends Component {
         const data = this.getPollData(this.props.match.params.pollID); 
 
     }
+
 
     getExitPath = () => {
         const username = getSessionCookie().username

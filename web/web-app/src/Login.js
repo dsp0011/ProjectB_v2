@@ -92,7 +92,8 @@ class Login extends Component {
                     <TextField 
                         id="outlined-basic" 
                         label="Password" 
-                        variant="filled" 
+                        variant="filled"
+                        type = "password" 
                         inputProps={{style: { textAlign: 'left', fontSize: 30}}}
                         InputLabelProps={{style: {textAlign: 'left', fontSize: 30}}}
                         onChange = {e => {updateSessionCookie("password", e.target.value);}} // TODO do not store this in the session cookie

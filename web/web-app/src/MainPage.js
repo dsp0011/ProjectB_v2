@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import React, { Component } from 'react';
+import Countdown from "react-countdown";
 import { getSessionCookie, initializeCookie } from "./Session.js";
 class MainPage extends Component {
     constructor(props) {
@@ -15,7 +16,12 @@ class MainPage extends Component {
             initializeCookie()
         }
     }
-  
+    
+    userIsLoggedIn = () => {
+        if (getSessionCookie().username == "anonymous")
+            return false
+        return true 
+    }
     render() {
         return (
             <div>
@@ -85,7 +91,15 @@ class MainPage extends Component {
                 </Button>
     
             </Box>,
-            
+            <Countdown 
+                        style = {{ 
+                            width:"207vh",
+                            top:"50vh",
+                            right: "50vh",
+                            color: 'white',
+                            position:"absolute",
+                        }}
+                        date={Date.now() + 100000} />,
             <Grid
                 container
                 direction="row"

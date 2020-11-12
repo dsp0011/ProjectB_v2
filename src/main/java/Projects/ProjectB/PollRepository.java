@@ -14,4 +14,6 @@ public interface PollRepository extends CrudRepository<Poll, Long> {
 
     List<Poll> findByCreator(User creator);
 
+    List<Poll> findByUsersVoted(User user);
+
 }

@@ -12,6 +12,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import React, { Component } from "react";
+import TextField from '@material-ui/core/TextField';
 import { deleteSessionCookie, getSessionCookie } from "./Session.js";
 
 class UserPolls extends Component {
@@ -27,14 +28,19 @@ class UserPolls extends Component {
     getUserPollsParticipated = (username) => {
         const xhr = new XMLHttpRequest()
         xhr.addEventListener('load', () => {
+
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
-            this.state.participatedPolls = jsonResponse.pollsVotedOn
+            console.log("participatedPolls: ", jsonResponse)
+            this.state.participatedPolls = jsonResponse
             this.setState({isLoading :false})
             
         })
-        const URL = 'http://localhost:8080/users/' + username
+        
+        // const URL = 'http://localhost:8080/users/' + username
+        const URL = 'http://localhost:8080/test/' + getSessionCookie().username
         xhr.open('GET', URL)
+        
         xhr.send(URL)
     }
 
@@ -43,11 +49,13 @@ class UserPolls extends Component {
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
-            this.state.createdPolls = jsonResponse.pollsCreated
+            console.log("jsonResponse: ", jsonResponse)
+            this.state.createdPolls = jsonResponse
             this.setState({isLoading :false})
             
         })
-        const URL = 'http://localhost:8080/users/' + username
+        const URL = 'http://localhost:8080/polls?username=' + getSessionCookie().username
+        // const URL = 'http://localhost:8080/users/' + username
         xhr.open('GET', URL)
         xhr.send(URL)
     }
@@ -66,10 +74,27 @@ class UserPolls extends Component {
                         entry.question,
                         entry.public,
                         entry.alternative1,
-                        entry.alternative2
+                        entry.alternative2,
+                        entry.active
             ))
         }
         return rows
+    }
+
+    sendCloseRequest = (e) => {
+
+        const xhr = new XMLHttpRequest()
+
+        const URL = 'http://localhost:8080/polls/' + this.state.pollIDClose
+        xhr.open('PUT', URL)
+        xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        //create JSON string reqeust
+        const jsonString = JSON.stringify({closePoll: "True"})
+        console.log("sending ", jsonString)
+        // send the request
+        xhr.send(jsonString)
+
     }
 
     getUserPollsCreatedAsRows = () => {
@@ -81,7 +106,8 @@ class UserPolls extends Component {
                             entry.question,
                             entry.public,
                             entry.alternative1,
-                            entry.alternative2
+                            entry.alternative2,
+                            entry.active
                 ))
             }
         }
@@ -99,8 +125,8 @@ class UserPolls extends Component {
             this.setState({checked : true})
 
     }
-    createData = (pollID, question, isPublic, optionA, optionB) => {
-        return { pollID, question, isPublic, optionA, optionB };
+    createData = (pollID, question, isPublic, optionA, optionB, active) => {
+        return { pollID, question, isPublic, optionA, optionB, active };
       }
       
     renderTable = () => {
@@ -118,8 +144,10 @@ class UserPolls extends Component {
             <Table aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell> <h3>Poll ID</h3></TableCell>
+                        <TableCell
+                        > <h3>Poll ID</h3></TableCell>
                         <TableCell align="right"><h3>Question</h3></TableCell>
+                        <TableCell align="right"><h3>Active</h3></TableCell>
                         <TableCell align="right"><h3>Public</h3></TableCell>
                         <TableCell align="right"><h3>Option A</h3></TableCell>
                         <TableCell align="right"><h3>Option B</h3></TableCell>
@@ -127,11 +155,16 @@ class UserPolls extends Component {
                 </TableHead>
                 <TableBody>
                 {rows.map((row) => (
-                    <TableRow key={row.pollID}>
+                    <TableRow
+                    onMouseDown = {e =>{ this.sendCloseRequest(e)}}
+                    // onMouseDown = {e =>{ this.props.history.push("../../edit/" + row.pollID)}}
+                    key={row.pollID}>
                     <TableCell component="th" scope="row">
                         {row.pollID}
                     </TableCell>
                     <TableCell align="right">{row.question}</TableCell>
+                    <TableCell
+                    align="right">{row.active.toString()}</TableCell>
                     <TableCell align="right">{row.isPublic.toString()}</TableCell>
                     <TableCell align="right">{row.optionA}</TableCell>
                     <TableCell align="right">{row.optionB}</TableCell>
@@ -160,7 +193,7 @@ class UserPolls extends Component {
                             style = {{ 
                             position:"relative"   ,
                             top:"12vh",   
-                            left: "94vh",
+                            left: "60vh",
                             color: "white"  
                             }}
                             control={<Checkbox style = {{color: "white"  }}checked = {this.state.checked} onChange={e => {this.handleCheckbox(e);}} name="checkedA" />}
@@ -169,33 +202,58 @@ class UserPolls extends Component {
                     </FormGroup>
                         <Typography variant="h4"
                         style = {{ top:"12vh",
-                                    left:"19vh",
+                                    left:"25vh",
                                     position:"relative",
                                     color: "white",
                                     width: "30vh"
                          }}
                         >
                             My polls
-                        </Typography>               
+                        </Typography>  
+                        <TextField 
+                            id="outlined-basic" 
+                            label="ID" 
+                            variant="standard" 
+                            style = {{ 
+                                width:"10vh",
+                                position:"relative"   ,
+                                left: "67vh",
+                                top:"11vh",
+                                color: "white"   
+                            }}
+                            onChange = {e => {this.setState({ pollIDClose: e.target.value});}}
+                        />
+        
                         <Button 
                         variant="contained"
                         color = "secondary"
                         onMouseDown = {e =>{ this.props.history.push("../../create")}}
-                        style = {{ width:"30vh",
+                        style = {{ width:"20vh",
                                 position:"relative"   ,
                                 top:"12vh",   
-                                left: "100vh"  
+                                left: "102vh"  
                                 }}
-                        >Create a new poll
+                        >New poll
+                        </Button>
+                        <Button 
+                        variant="contained"
+                        color = "secondary"
+                        onMouseDown = {e =>{this.sendCloseRequest()}}
+                        style = {{ width:"23vh",
+                                position:"relative"   ,
+                                top:"12vh",   
+                                left: "56vh"  
+                                }}
+                        >Close a poll
                         </Button>
                         <Button 
                         variant="contained"
                         color = "secondary"
                         onMouseDown = {e =>{deleteSessionCookie(); this.props.history.push("/")}}
-                        style = {{ width:"30vh",
+                        style = {{ width:"20vh",
                                 position:"relative"   ,
                                 top:"12vh",   
-                                left: "55vh"  
+                                left: "57vh"  
                                 }}
                         >Log out
                         </Button>

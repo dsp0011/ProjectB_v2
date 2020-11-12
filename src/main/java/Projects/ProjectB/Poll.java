@@ -27,6 +27,9 @@ public class Poll {
     @ManyToOne
     private User creator;
 
+    @ManyToMany
+    private List<User> usersVoted;
+
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL)
     private List<IotDevice> iotDevices;
 
@@ -41,6 +44,7 @@ public class Poll {
         this.isPublic = isPublic;
         this.isActive = isActive;
         this.canEdit = canEdit;
+        this.usersVoted = new ArrayList<>();
         setTimeLimit(timeLimit);
         this.creator = creator;
         this.vote = new Vote();
@@ -235,5 +239,22 @@ public class Poll {
                 isPublic, isActive, canEdit, timeLimit,
                 pollClosingDate, creator, vote
         );
+    }
+
+    public List<User> getUsersVoted() {
+        return usersVoted;
+    }
+
+    public void updateUsersVoted(User user) {
+        if (this.usersVoted == null) {
+            this.usersVoted = new ArrayList<>();
+            this.usersVoted.add(user);
+        } else {
+            this.usersVoted.add(user);
+        }
+    }
+
+    public void setUsersVoted(List<User> usersVoted) {
+        this.usersVoted = usersVoted;
     }
 }
