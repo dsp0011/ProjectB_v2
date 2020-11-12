@@ -43,7 +43,7 @@ class PollParticipate extends Component {
         const URL = 'http://localhost:8080/users/participatePoll/' + getSessionCookie().username
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Content-Type', 'application/json');
-        //create JSON string reqeust
+        //create JSON string request
         const jsonString = JSON.stringify(this.makePollJSON())
         // send the request
         xhr.send(jsonString)
