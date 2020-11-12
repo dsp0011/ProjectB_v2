@@ -1,12 +1,22 @@
-package Projects.ProjectB;
+package Projects.ProjectB.entities;
 
 import Projects.ProjectB.time.ITimeDuration;
+import Projects.ProjectB.time.TimeDuration;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Poll {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -14,11 +24,12 @@ public class Poll {
     private String question;
     private String alternative1;
     private String alternative2;
-    private String timeLimit; // The duration for how long the poll should remain active.
-    private String pollClosingDate; // The target time for when the poll should close.
+    @Setter(AccessLevel.NONE)private String timeLimit; // The duration for how long the poll should remain active.
+    @Setter(AccessLevel.NONE)private String pollClosingDate; // The target time for when the poll should close.
     private boolean isPublic;
     private boolean isActive;
     private boolean canEdit; // Specify if the poll is still editable.
+
 
     @OneToOne(cascade = CascadeType.ALL)
     private Vote vote = new Vote();
@@ -28,9 +39,6 @@ public class Poll {
 
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL)
     private List<IotDevice> iotDevices;
-
-    public Poll() {
-    }
 
     public Poll(String question, String alternative1, String alternative2,
                 String timeLimit, boolean isPublic, boolean isActive, boolean canEdit, User creator) {
@@ -91,41 +99,20 @@ public class Poll {
         }
     }
 
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-    public String getAlternative1() {
-        return alternative1;
-    }
-
-    public void setAlternative1(String alternative1) {
-        this.alternative1 = alternative1;
-    }
-
-    public String getAlternative2() {
-        return alternative2;
-    }
-
-    public void setAlternative2(String alternative2) {
-        this.alternative2 = alternative2;
-    }
-
-    public String getTimeLimit() {
-        return timeLimit;
+    /**
+     * Compute the time between now and pollClosingDate,
+     * and return the TimeDuration.
+     *
+     * @return The time left before the poll closes as time units or "inf".
+     */
+    public String computeTimeRemaining() {
+        if (pollClosingDate.toLowerCase().equals("inf")) {
+            return "inf";
+        }
+        ZonedDateTime closingDate = ZonedDateTime.parse(pollClosingDate);
+        ZonedDateTime now = ZonedDateTime.now();
+        long seconds = ChronoUnit.SECONDS.between(now, closingDate);
+        return new TimeDuration(seconds).toString();
     }
 
     public void setTimeLimit(String timeLimit) {
@@ -136,7 +123,6 @@ public class Poll {
         } else {
             this.timeLimit = timeLimit;
         }
-        System.out.println();
         updatePollClosingDate();
     }
 
@@ -155,65 +141,12 @@ public class Poll {
         }
     }
 
-    public String getPollClosingDate() {
-        return this.pollClosingDate;
-    }
-
     public void setPollClosingDate(String pollClosingDate) {
-        System.out.println("pollClosingDate value = " + pollClosingDate);
         if (this.canEdit) {
             updatePollClosingDate();
         } else {
             this.pollClosingDate = pollClosingDate;
         }
-    }
-
-    public boolean getPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
-
-    public boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public Vote getVote() {
-        return vote;
-    }
-
-    public void setVote(Vote vote) {
-        this.vote = vote;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
-
-    public List<IotDevice> getIotDevices() {
-        return iotDevices;
-    }
-
-    public void setIotDevices(List<IotDevice> iotDevices) {
-        this.iotDevices = iotDevices;
-    }
-
-    public boolean getCanEdit() {
-        return canEdit;
-    }
-
-    public void setCanEdit(boolean canEdit) {
-        this.canEdit = canEdit;
     }
 
     @Override

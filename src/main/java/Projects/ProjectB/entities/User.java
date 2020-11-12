@@ -1,12 +1,19 @@
-package Projects.ProjectB;
+package Projects.ProjectB.entities;
 
 
 import Projects.ProjectB.security.PasswordRandomizer;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "pollUser")
 public class User {
@@ -16,7 +23,8 @@ public class User {
     @Column(unique = true)
     private String userName;
 
-    private String passwordAsHash;
+//    @JsonIgnore // Enable to prevent password from being used in output.
+    @Setter(AccessLevel.NONE)private String passwordAsHash;
     private String firstName;
     private String lastName;
 
@@ -32,24 +40,14 @@ public class User {
     @ElementCollection
     private List<Long> idsOfPollsCreated;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-    public User() {
-
-    }
 
     public User(String userName, String password, String firstName, String lastName) {
         this.userName = userName;
         setPasswordAsHash(password);
         this.firstName = firstName;
         this.lastName = lastName;
-//        this.idsOfPollsVotedOn = new ArrayList<>();
-//        this.idsOfPollsCreated = new ArrayList<>();
+        this.idsOfPollsVotedOn = new ArrayList<>();
+        this.idsOfPollsCreated = new ArrayList<>();
     }
 
     public boolean verifyPassword(String password) {
@@ -64,44 +62,10 @@ public class User {
         this.idsOfPollsVotedOn.add(poll.getId());
     }
 
-
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPasswordAsHash() {
-        return passwordAsHash;
-    }
-
     public void setPasswordAsHash(String password) {
         this.passwordAsHash = PasswordRandomizer.encodePassword(password);
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-
-    public List<Poll> getPollsVotedOn() {
-        return pollsVotedOn;
-    }
     public void addPollCreated(Poll pollCreated) {
         if (this.pollsCreated == null) {
             this.pollsCreated = new ArrayList<>();
@@ -120,29 +84,14 @@ public class User {
         }
     }
 
-
-    public void setPollsVotedOn(List<Long> idsOfPollsVotedOn) {
-        this.idsOfPollsVotedOn = idsOfPollsVotedOn;
-    }
-
-
-    public List<Poll> getPollsCreated() {
-        return pollsCreated;
-    }
-
-    public void setPollsCreatedID(List<Long> idsOfPollsCreated) {
-        this.idsOfPollsCreated = idsOfPollsCreated;
-    }
-
     @Override
     public String toString() {
         return String.format(
                 "User[Id='%d', " +
                         "userName='%s', " +
-                        "password='%s', " +
                         "firstName='%s', " +
                         "lastName='%s']",
-                id, userName, passwordAsHash, firstName, lastName
+                id, userName, firstName, lastName
         );
     }
 }
