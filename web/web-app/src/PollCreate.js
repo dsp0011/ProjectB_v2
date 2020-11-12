@@ -67,7 +67,7 @@ class PollCreate extends Component {
         xhr.open('POST', URL)
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
         xhr.setRequestHeader('Content-Type', 'application/json');
-        //create JSON string reqeust
+        //create JSON string request
         const jsonString = JSON.stringify(pollData)
         // send the request
         xhr.send(jsonString)

@@ -23,6 +23,7 @@ public class User {
     @Column(unique = true)
     private String userName;
 
+//    @JsonIgnore // Enable to prevent password from being used in output.
     @Setter(AccessLevel.NONE)private String passwordAsHash;
     private String firstName;
     private String lastName;
@@ -45,8 +46,8 @@ public class User {
         setPasswordAsHash(password);
         this.firstName = firstName;
         this.lastName = lastName;
-//        this.idsOfPollsVotedOn = new ArrayList<>();
-//        this.idsOfPollsCreated = new ArrayList<>();
+        this.idsOfPollsVotedOn = new ArrayList<>();
+        this.idsOfPollsCreated = new ArrayList<>();
     }
 
     public boolean verifyPassword(String password) {
@@ -88,10 +89,9 @@ public class User {
         return String.format(
                 "User[Id='%d', " +
                         "userName='%s', " +
-                        "password='%s', " +
                         "firstName='%s', " +
                         "lastName='%s']",
-                id, userName, passwordAsHash, firstName, lastName
+                id, userName, firstName, lastName
         );
     }
 }

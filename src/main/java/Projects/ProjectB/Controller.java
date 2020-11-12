@@ -184,15 +184,33 @@ public class Controller {
 
 	@PutMapping("/users/participatePoll/{userName}")
 	public String updateUserPollsParticipated(@PathVariable String userName, @RequestBody Map<String, String> json) {
-		long pollID = Long.parseLong(json.get("pollID"));
-		String creatorUserName = "" + json.get("creator");
-		User creator = userRepository.findByUserName(creatorUserName);
-
-		Poll poll = pollRepository.findById(pollID);
-		creator.addPollVotedOn(poll);
-		userRepository.save(creator);
-		return "";
-
+		log.info("Attempting to register a users participation on a poll");
+		try {
+			long pollID = Long.parseLong("" + json.get("pollID"));
+			System.out.println("userName = " + userName);
+			Poll poll = pollRepository.findById(pollID);
+			User participant = userRepository.findByUserName(userName);
+			if (!pollExistsInDatabase(poll)) {
+				log.info("Failed to register user with username: '" + userName
+						+ "' participating on poll with ID: " + pollID);
+				return "Failed to register poll participation\n" +
+						"Poll did not exist";
+			} else if (!userExistsInDatabase(participant) ) {
+				log.info("User is anonymous");
+				return "Anonymous participant";
+			} else {
+				participant.addPollVotedOn(poll);
+				participant.votedOnANewPoll(poll);
+				userRepository.save(participant);
+				log.info("Successfully registered the poll with ID: " + pollID
+						+ ", as voted on by user with ID: " + participant.getId());
+				return "Successfully registered the poll as voted on by the user";
+			}
+		} catch (Exception e) {
+			log.info("Failed to register the users participation on the poll");
+			return "Something went wrong\n" +
+					"Failed to register poll participation";
+		}
 	}
 
 //
@@ -293,8 +311,9 @@ public class Controller {
 
     private void removeUsersConnectionToCreatedPolls(User user) {
 	    // Removes foreign key constraints.
-        for (Poll poll: user.getPollsCreated()) {
-            poll.setCreator(null);
+        for (long pollId : user.getIdsOfPollsCreated()) {
+            Poll poll = pollRepository.findById(pollId);
+        	poll.setCreator(null);
         }
     }
 
