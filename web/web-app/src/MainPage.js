@@ -27,7 +27,7 @@ class MainPage extends Component {
                 minHeight="100vh"
             >
                 <Box
-                    bgcolor="black" 
+                    bgcolor="#424242"  
                     style = {{ width:"100%",
                                height:"7vh",
                                position:"absolute"   ,

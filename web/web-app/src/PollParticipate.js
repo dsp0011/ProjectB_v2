@@ -122,6 +122,8 @@ class PollParticipate extends Component {
                         width = "60vh"
                         style = {{ border: '3px solid',
                                 position:"absolute"   ,
+                                background: 'linear-gradient(to right bottom, #d7ccc8, #a69b97)'
+
                      }}
     
                     >
@@ -134,7 +136,6 @@ class PollParticipate extends Component {
                         style = {{
                                 position:"absolute",
                                 borderBottom: '3px solid',
-                                background: 'linear-gradient(to right bottom, #00363a, #6d6d6d)'
 
                      }}
 
