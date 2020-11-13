@@ -14,7 +14,7 @@
         let pollId = null;
         let timer = null;
 
-        function connect(newPollId, blockAllUpdates = false, timeUpdates = true, voteUpdates = true) {
+        function connect(newPollId, timeUpdates = true, voteUpdates = true, mainChannelUpdates = true,) {
             if (stompClient != null) {
                 disconnect(); // Only allowed to be connected to one poll at a time.
             }
@@ -24,13 +24,17 @@
 
             stompClient.connect({}, function () {
                 console.log("Opened a new connection to the server");
-                if (blockAllUpdates === true) {
+                const channel = "/topic/pollWithId_" + pollId;
+                if (timeUpdates === false
+                    && voteUpdates === false
+                    && mainChannelUpdates === false) {
                     console.log("Not subscribed to any channel");
                 } else {
-                    const channel = "/topic/pollWithId_" + pollId;
-                    stompClient.subscribe(channel, function (messageOutput) {
-                    });
-                    console.log("Now subscribed to main channel: " + channel);
+                    if (mainChannelUpdates === true) {
+                        stompClient.subscribe(channel, function (messageOutput) {
+                        });
+                        console.log("Now subscribed to main channel: " + channel);
+                    }
                     if (timeUpdates === true) {
                         const channelForTimeUpdates = channel + "/timeRemaining";
                         stompClient.subscribe(channelForTimeUpdates, function (messageOutput) {
