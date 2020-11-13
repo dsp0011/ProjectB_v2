@@ -128,7 +128,7 @@ class ViewPoll extends Component {
                     width = "60vh"
                     style = {{ border: '1px solid',
                             position:"absolute"   ,
-                            background: 'linear-gradient(to right bottom, #1b1b1b, #424242)'
+                            background: 'linear-gradient(to right bottom, #d7ccc8, #a69b97)'
 
                  }}
 
@@ -142,7 +142,6 @@ class ViewPoll extends Component {
                     style = {{ 
                             position:"absolute",
                             borderBottom: '3px solid',
-                            background: 'linear-gradient(to right bottom, #00363a, #6d6d6d)'
 
                  }}
 
