@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @Configuration
 @EnableWebSecurity
@@ -37,6 +36,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     // Specify web pages that are open to all users.
                     // TODO: Update to represent actual web pages before production.
                     .antMatchers("/",
+                            "/index",
+                            "/chat",
                             "/home",
                             "/users",
                             "/polls",
@@ -53,6 +54,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                 .logout().permitAll(); // Logout page is open for all.
          */
+    /*    http
+                // Requires that HTTPS be used when sending requests.
+                .requiresChannel()
+                .anyRequest()
+                .requiresSecure();
+     */
     }
 
     @Bean

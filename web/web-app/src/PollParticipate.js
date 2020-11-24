@@ -32,7 +32,7 @@ class PollParticipate extends Component {
         xhr.setRequestHeader('Content-Type', 'application/json');
 
         var jsonString = "";
-        (alternative == 1) ?  jsonString = JSON.stringify( {alternative1: 1}) : jsonString = JSON.stringify( {alternative2: 1})
+        (alternative === 1) ?  jsonString = JSON.stringify( {alternative1: 1}) : jsonString = JSON.stringify( {alternative2: 1})
 
         xhr.send(jsonString)
 
@@ -75,14 +75,19 @@ class PollParticipate extends Component {
     makePollJSON = () => {
         return (
             {
+                pollID : this.state.pollID
+
+
+
+                /*
                 question : this.state.question,
                 pollID : this.state.pollID,
                 alternative1 :this.state.optionA,
                 alternative2 :this.state.optionB,
                 creator:getSessionCookie().username,
                 timeLimit : this.state.timeLimit,
-                public : this.state.public,
-
+                public : this.state.public
+                 */
             }
         )
 
@@ -121,7 +126,7 @@ class PollParticipate extends Component {
 
     userCanAccessPoll = () => {
         return this.state.public
-               || !this.state.public &&  getSessionCookie() != "anonymous"
+               || !this.state.public &&  getSessionCookie() !== "anonymous"
     }
 
     getTimeRemainingText = () => {
@@ -162,16 +167,24 @@ class PollParticipate extends Component {
     
                     >
                         <Box
+<<<<<<< HEAD
                         bgcolor="secondary.main" 
+=======
+                        bgcolor="secondary.dark"
+>>>>>>> master
                         justifyContent="center"
                         alignItems="flex-top"
                         height = "10vh"
                         width = "60vh"
-                        style = {{ 
+                        style = {{
                                 position:"absolute",
                                 borderBottom: '3px solid',
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
                      }}
-    
+
                     ></Box>
                         <Typography variant="h4"
                             style = {{ top:"3vh",

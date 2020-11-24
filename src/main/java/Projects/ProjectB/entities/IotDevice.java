@@ -1,8 +1,15 @@
-package Projects.ProjectB;
+package Projects.ProjectB.entities;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class IotDevice {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -10,26 +17,6 @@ public class IotDevice {
 
     @ManyToOne
     private Poll poll;
-
-    public IotDevice() {
-
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Poll getPoll() {
-        return poll;
-    }
-
-    public void setPoll(Poll poll) {
-        this.poll = poll;
-    }
 
     @Override
     public String toString() {

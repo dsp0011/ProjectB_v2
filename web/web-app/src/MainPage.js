@@ -12,7 +12,7 @@ class MainPage extends Component {
     }
 
     componentDidMount() {
-        if (getSessionCookie() === "anonymous" || getSessionCookie() == undefined){
+        if (getSessionCookie() === "anonymous" || getSessionCookie() === undefined){
             initializeCookie()
         }
     }
