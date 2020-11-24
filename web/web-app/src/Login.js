@@ -51,6 +51,8 @@ class Login extends Component {
                     width = "60vh"
                     style = {{ border: '3px solid',
                             position:"absolute"   ,
+                            background: 'linear-gradient(to right bottom, #d7ccc8, #a69b97)'
+
                  }}
 
                 >
