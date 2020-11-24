@@ -189,6 +189,7 @@ public class Controller {
 		creator.addPollVotedOn(poll);
 		userRepository.save(creator);
 		return "";
+	}
 
 
 	@PutMapping("/users/participatePoll/{userName}")
@@ -222,20 +223,6 @@ public class Controller {
 		}
 	}
 
-
-
-	@PutMapping("/users/participatePoll/{userName}")
-	public String updateUserPollsParticipated(@PathVariable String userName, @RequestBody Map<String, String> json) {
-//		int pollID = Integer.parseInt(json.get("pollID"));
-//		String creatorUserName = "" + json.get("creator");
-//		User creator = userRepository.findByUserName(creatorUserName);
-//
-//		Poll poll = pollRepository.findById(pollID);
-//		creator.addPollVotedOn(poll);
-//		userRepository.save(creator);
-		return "";
-
-	}
 
 
 	@PutMapping("/users/{userName}")

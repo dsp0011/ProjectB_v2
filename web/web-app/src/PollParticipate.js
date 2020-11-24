@@ -167,11 +167,7 @@ class PollParticipate extends Component {
     
                     >
                         <Box
-<<<<<<< HEAD
                         bgcolor="secondary.main" 
-=======
-                        bgcolor="secondary.dark"
->>>>>>> master
                         justifyContent="center"
                         alignItems="flex-top"
                         height = "10vh"
@@ -179,10 +175,6 @@ class PollParticipate extends Component {
                         style = {{
                                 position:"absolute",
                                 borderBottom: '3px solid',
-<<<<<<< HEAD
-=======
-
->>>>>>> master
                      }}
 
                     ></Box>
