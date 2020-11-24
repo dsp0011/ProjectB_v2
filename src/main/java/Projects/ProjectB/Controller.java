@@ -178,7 +178,6 @@ public class Controller {
 		return "";
 
 	}
-<<<<<<< HEAD
 	@PutMapping("/users/edit/{userName}")
 	public String updateUserPollsEdited(@PathVariable String userName, @RequestBody Map<String, String> json) {
 		int pollID = Integer.parseInt(json.get("pollID"));
@@ -191,7 +190,6 @@ public class Controller {
 		userRepository.save(creator);
 		return "";
 
-=======
 
 	@PutMapping("/users/participatePoll/{userName}")
 	public String updateUserPollsParticipated(@PathVariable String userName, @RequestBody Map<String, String> json) {
@@ -222,7 +220,6 @@ public class Controller {
 			return "Something went wrong\n" +
 					"Failed to register poll participation";
 		}
->>>>>>> master
 	}
 
 
