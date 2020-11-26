@@ -48,7 +48,8 @@ class EditPoll extends Component {
                         optionAVotes: jsonResponse["vote"]["alternative1"],
                         optionBVotes: jsonResponse["vote"]["alternative2"],
                         timeLimit: jsonResponse["timeLimit"],
-                        checked: jsonResponse["public"],
+                        public: jsonResponse["public"],
+                        publish: jsonResponse["active"]
                     })
                 
             
@@ -68,30 +69,39 @@ class EditPoll extends Component {
     makePollJSON = () => {
         return (
             {
-                question : this.state.question,
-                alternative1 :this.state.optionA,
-                alternative2 :this.state.optionB, 
-                creator:getSessionCookie().username,
-                timeLimit : this.state.timeLimit,
-                public : this.state.public,
-                active: "true",
+                newQuestion : this.state.question,
+                newAlternative1 :this.state.optionA,
+                newAlternative2 :this.state.optionB, 
+                newTimeLimit : this.state.timeLimit,
+                stillPublic : this.state.public,    
+                publishPoll: this.state.publish,
             }
         )
 
     }
     handleCheckbox = (e) => {
-        if (this.state.checked === true)
+        if (this.state.public === true)
             this.setState({public : false})
         else 
             this.setState({public : true})
 
     }
+
+    
+    handlePublishCheckbox = (e) => {
+        if (this.state.publish === true)
+            this.setState({publish : false})
+        else 
+            this.setState({publish : true})
+    }
+
     updatePoll = () => {
 
         const xhr = new XMLHttpRequest()
 
         const pollData = this.makePollJSON()
         const URL = 'http://localhost:8080/polls/' + this.props.match.params.pollID
+        console.log("poll data: ", pollData)
         console.log("URL", URL)
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
@@ -142,7 +152,6 @@ class EditPoll extends Component {
                         style = {{ 
                                 position:"absolute",
                                 borderBottom: '3px solid',
-                                background: 'linear-gradient(to right bottom, #00363a, #6d6d6d)'
     
                      }}
     
@@ -218,24 +227,33 @@ class EditPoll extends Component {
                     <FormGroup row>
                         <FormControlLabel
                             style = {{ 
-                            position:"relative"   ,
-                            top:"18vh",   
-                            left: "32vh",
-                            }}
-                            control={<Checkbox checked = {this.state.checked} onChange={e => {this.handleCheckbox(e);}} name="checkedA" />}
+                                position:"relative"   ,
+                                top:"15vh",   
+                                left: "36.7vh",
+                                }}
+                            control={<Checkbox checked = {this.state.public} onChange={e => {this.handleCheckbox(e);}} name="checkedA" />}
                             label="Public"
+                        />
+                        <FormControlLabel
+                            style = {{ 
+                                position:"relative"   ,
+                                top:"19vh",   
+                                left: "27vh",
+                                }}
+                            control={<Checkbox checked = {this.state.publish} onChange={e => {this.handlePublishCheckbox(e);}} name="checkedB" />}
+                            label="Publish"
                         />
                     </FormGroup>
                     <Button 
                         component={Link}
                         variant="contained"
                         color = "secondary"
-                        // to = {"../users/" + getSessionCookie().username}
-                        onClick = {e => {this.updatePoll(); this.addUserCreatedPoll();}} // send HTTP request here
+                        to = {"../users/" + getSessionCookie().username}
+                        onClick = {e => {this.updatePoll();}} // send HTTP request here
                         style = {{ width:"27vh",
                                    position:"relative"   ,
                                    top:"25vh",
-                                   right:"5vh"     
+                                   right:"9vh"     
                                 }}
                     >Edit
                     </Button>

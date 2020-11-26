@@ -65,7 +65,19 @@ class PollCreate extends Component {
             }
         )
 
+    
     }
+
+
+    handlePublishCheckbox = (e) => {
+        if (this.state.publish === true)
+            this.setState({publish : false})
+        else 
+            this.setState({publish : true})
+    }
+
+
+
     handleCheckbox = (e) => {
         if (this.state.checked === true)
             this.setState({public : false})
@@ -82,7 +94,8 @@ class PollCreate extends Component {
             const jsonResponse = JSON.parse(data)
             console.log("poll id: ", jsonResponse)
             this.addUserCreatedPoll();
-            this.publishPoll(jsonResponse);
+            if (this.state.publish)
+                this.publishPoll(jsonResponse);
         })
         const pollData = this.makePollJSON()
         const URL = 'http://localhost:8080/polls/'
@@ -203,12 +216,21 @@ class PollCreate extends Component {
                     <FormGroup row>
                         <FormControlLabel
                             style = {{ 
-                            position:"relative"   ,
-                            top:"18vh",   
-                            left: "32vh",
-                            }}
+                                position:"relative"   ,
+                                top:"15vh",   
+                                left: "36.7vh",
+                                }}
                             control={<Checkbox checked = {this.state.checked} onChange={e => {this.handleCheckbox(e);}} name="checkedA" />}
                             label="Public"
+                        />
+                        <FormControlLabel
+                            style = {{ 
+                                position:"relative"   ,
+                                top:"19vh",   
+                                left: "27vh",
+                                }}
+                            control={<Checkbox checked = {this.state.publish} onChange={e => {this.handlePublishCheckbox(e);}} name="checkedB" />}
+                            label="Publish"
                         />
                     </FormGroup>
                     <Button 
@@ -220,7 +242,7 @@ class PollCreate extends Component {
                         style = {{ width:"27vh",
                                    position:"relative"   ,
                                    top:"25vh",
-                                   right:"5vh"     
+                                   right:"9vh"     
                                 }}
                     >Publish poll
                     </Button>
