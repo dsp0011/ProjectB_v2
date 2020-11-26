@@ -162,22 +162,35 @@ public class Controller {
 
 	@PutMapping("/users/createPoll/{userName}")
 	public String updateUserPollsCreated(@PathVariable String userName, @RequestBody Map<String, String> json) {
-		String question = "" + json.get("question");
-		String alternative1 = "" + json.get("alternative1");
-		String alternative2 = "" + json.get("alternative2");
-		String timeLimit = "" + json.get("timeLimit");
-		boolean isPublic = Boolean.parseBoolean("" + json.get("public"));
-		String creatorUserName = "" + json.get("creator");
-		User creator = userRepository.findByUserName(creatorUserName);
-
-		Poll poll = new Poll(question, alternative1, alternative2,
-				timeLimit, isPublic, false, true, null);
-
-		creator.addPollCreated(poll);
-		userRepository.save(creator);
+//		String question = "" + json.get("question");
+//		String alternative1 = "" + json.get("alternative1");
+//		String alternative2 = "" + json.get("alternative2");
+//		String timeLimit = "" + json.get("timeLimit");
+//		boolean isPublic = Boolean.parseBoolean("" + json.get("public"));
+//		String creatorUserName = "" + json.get("creator");
+//		User creator = userRepository.findByUserName(creatorUserName);
+//
+//		Poll poll = new Poll(question, alternative1, alternative2,
+//				timeLimit, isPublic, false, true, null);
+//
+//		creator.addPollCreated(poll);
+//		userRepository.save(creator);
 		return "";
 
 	}
+	@PutMapping("/users/edit/{userName}")
+	public String updateUserPollsEdited(@PathVariable String userName, @RequestBody Map<String, String> json) {
+		int pollID = Integer.parseInt(json.get("pollID"));
+		String creatorUserName = "" + json.get("creator");
+		User creator = userRepository.findByUserName(creatorUserName);
+		Poll poll = pollRepository.findById(pollID);
+
+
+		creator.addPollVotedOn(poll);
+		userRepository.save(creator);
+		return "";
+	}
+
 
 	@PutMapping("/users/participatePoll/{userName}")
 	public String updateUserPollsParticipated(@PathVariable String userName, @RequestBody Map<String, String> json) {
@@ -210,15 +223,6 @@ public class Controller {
 		}
 	}
 
-//
-//	@PutMapping("/users/createPoll/{userName}")
-//	@CrossOrigin(origins = "*")
-//	public @ResponseBody User updateUserPollsCreated(@PathVariable String userName, @RequestBody User user) {
-//		System.out.println("user: " + user);
-//		User oldUser = userRepository.findByUserName(userName);
-//		oldUser.addPollCreated(user.getPollsCreated().get(0));
-//		return userRepository.save(oldUser);
-//	}
 
 
 	@PutMapping("/users/{userName}")
@@ -339,15 +343,38 @@ public class Controller {
 			creator.createdANewPoll(poll);
 			userRepository.save(creator);
 			log.info("Poll was created successfully");
-			return "Poll saved";
+			return Long.toString(poll.getId());
 		}
 	}
 
 	@GetMapping("/polls")
-	public @ResponseBody Iterable<Poll> getAllPolls() {
+	public @ResponseBody Iterable<Poll> getAllPolls(@RequestParam(name = "username", required = false) String username) {
 		log.info("Getting all polls");
-		// This returns a JSON or XML with the users
-		return pollRepository.findAll();
+
+		if(username != null) {
+			User user = userRepository.findByUserName(username);
+			return pollRepository.findByCreator(user);
+		} else {
+			// This returns a JSON or XML with the users
+			return pollRepository.findAll();
+		}
+	}
+
+	@PutMapping("polls/vote/{userName}")
+	public @ResponseBody String addVotedPolls(@PathVariable String userName, @RequestBody Map<String, String> json) {
+		long pollID = Long.parseLong(json.get("pollID"));
+		User user = userRepository.findByUserName(userName);
+		Poll poll = pollRepository.findById(pollID);
+		poll.updateUsersVoted(user);
+		pollRepository.save(poll);
+		System.out.println("added poll voted");
+		return "";
+	}
+
+	@GetMapping("test/{userName}")
+	public @ResponseBody Iterable<Poll> getVotedPolls(@PathVariable String userName) {
+		User user = userRepository.findByUserName(userName);
+		return pollRepository.findByUsersVoted(user);
 	}
 
 	@GetMapping("/polls/{id}")
