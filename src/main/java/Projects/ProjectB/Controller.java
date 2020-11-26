@@ -575,9 +575,14 @@ public class Controller {
 		Vote newVote = poll.getVote();
 		newVote.setAlternative1(newVote.getAlternative1() + vote.getAlternative1());
 		newVote.setAlternative2(newVote.getAlternative2() + vote.getAlternative2());
-		poll.setVote(newVote);
-		log.info("Updating votes for poll with id: " + id);
-		return pollRepository.save(poll);
+		if (poll.isActive()) {
+			poll.setVote(newVote);
+			log.info("Updating votes for poll with id: " + id);
+			return pollRepository.save(poll);
+		} else {
+			log.info("Unable to update votes for poll with id: " + id);
+			return null;
+		}
 	}
 
 	/*
