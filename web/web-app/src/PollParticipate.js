@@ -20,9 +20,19 @@ class PollParticipate extends Component {
                       public: false}
     }
 
+    userHasVoted = () => {
+        const currentUsername = getSessionCookie().username
+
+        if (this.state.usersVoted != null) 
+            for (const user of this.state.usersVoted) 
+                if (user.userName === currentUsername)
+                    return true
+        return false
+    }
+
   
     sendVoteUpdate = (alternative) => {
-        if (getSessionCookie().username === "anonymous")
+        if (getSessionCookie().username === "anonymous" || this.userHasVoted())
             return
         const xhr = new XMLHttpRequest()
         const URL = 'http://localhost:8080/votes/' + this.props.match.params.pollID
@@ -39,21 +49,22 @@ class PollParticipate extends Component {
     }
 
     sendUserPollVotedUpdate = () => {
+        if(this.userHasVoted())
+            return
+        const xhr = new XMLHttpRequest()
+        const pollData = this.state.poll
+        pollData.public = this.state.public
 
-            const xhr = new XMLHttpRequest()
-            const pollData = this.state.poll
-            pollData.public = this.state.public
-
-            const URL = 'http://localhost:8080/polls/vote/' + getSessionCookie().username
-            // const URL = 'http://localhost:8080/users/participatePoll/' + getSessionCookie().username
-            xhr.open('PUT', URL)
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            //create JSON string reqeust
-            const jsonString = JSON.stringify({pollID: this.state.pollID})
-            console.log("URL: ", URL)
-            console.log("jsonString ", jsonString)
-            // send the request
-            xhr.send(jsonString)
+        const URL = 'http://localhost:8080/polls/vote/' + getSessionCookie().username
+        // const URL = 'http://localhost:8080/users/participatePoll/' + getSessionCookie().username
+        xhr.open('PUT', URL)
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        //create JSON string reqeust
+        const jsonString = JSON.stringify({pollID: this.state.pollID})
+        console.log("URL: ", URL)
+        console.log("jsonString ", jsonString)
+        // send the request
+        xhr.send(jsonString)
     }
 
 
@@ -99,6 +110,7 @@ class PollParticipate extends Component {
         xhr.addEventListener('load', () => {
             const data = xhr.responseText
             const jsonResponse = JSON.parse(data)
+            console.log("jsonResponse ", jsonResponse)
             this.setState({question: jsonResponse["question"],
                 optionA: jsonResponse["alternative1"],
                 optionB: jsonResponse["alternative2"],
@@ -106,7 +118,8 @@ class PollParticipate extends Component {
                 public: jsonResponse["public"],
                 poll : jsonResponse,
                 pollID : jsonResponse["id"],
-                pollClosingDate: jsonResponse["pollClosingDate"]
+                pollClosingDate: jsonResponse["pollClosingDate"],
+                usersVoted : jsonResponse["usersVoted"]
                 
             })
             this.getTimeRemaining()
