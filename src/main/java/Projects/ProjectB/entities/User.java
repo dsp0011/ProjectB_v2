@@ -2,6 +2,7 @@ package Projects.ProjectB.entities;
 
 
 import Projects.ProjectB.security.PasswordRandomizer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class User {
     @Column(unique = true)
     private String userName;
 
-//    @JsonIgnore // Enable to prevent password from being used in output.
+    @JsonIgnore // Enable to prevent password from being used in output.
     @Setter(AccessLevel.NONE)private String passwordAsHash;
     private String firstName;
     private String lastName;
