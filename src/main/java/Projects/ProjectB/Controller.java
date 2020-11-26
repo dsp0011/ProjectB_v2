@@ -380,8 +380,12 @@ public class Controller {
 	@GetMapping("/polls/{id}")
 	public @ResponseBody Poll getPoll(@PathVariable long id) {
 		log.info("Attempting to get existing poll");
-		// This returns a JSON or XML with the users
-		return pollRepository.findById(id);
+		Poll poll = pollRepository.findById(id);
+		if (!pollExistsInDatabase(poll)) {
+			return null;
+		}
+		log.info("Successfully retrieved poll with id: " + id);
+		return poll;
 	}
 
 	@PutMapping("/polls/{id}")
