@@ -14,7 +14,4 @@ public class InputMessage {
     private long pollId;
     private int votesForAlternative1;
     private int votesForAlternative2;
-    private boolean requestingToAddVotesToPoll;
-    private boolean requestingTimeRemaining;
-    private boolean requestingNumberOfVotes;
 }

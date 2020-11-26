@@ -14,7 +14,7 @@
         let pollId = null;
         let timer = null;
 
-        function connect(newPollId, timeUpdates = true, voteUpdates = true, mainChannelUpdates = true,) {
+        function connect(newPollId, timeUpdates = true, voteUpdates = true) {
             if (stompClient != null) {
                 disconnect(); // Only allowed to be connected to one poll at a time.
             }
@@ -25,16 +25,9 @@
             stompClient.connect({}, function () {
                 console.log("Opened a new connection to the server");
                 const channel = "/topic/pollWithId_" + pollId;
-                if (timeUpdates === false
-                    && voteUpdates === false
-                    && mainChannelUpdates === false) {
+                if (timeUpdates === false && voteUpdates === false) {
                     console.log("Not subscribed to any channel");
                 } else {
-                    if (mainChannelUpdates === true) {
-                        stompClient.subscribe(channel, function (messageOutput) {
-                        });
-                        console.log("Now subscribed to main channel: " + channel);
-                    }
                     if (timeUpdates === true) {
                         const channelForTimeUpdates = channel + "/timeRemaining";
                         stompClient.subscribe(channelForTimeUpdates, function (messageOutput) {
@@ -65,12 +58,7 @@
             console.log("Attempting to get time remaining for poll with id: " + pollId);
             if (stompClient != null) {
                 const message = JSON.stringify({
-                    pollId: pollId,
-                    votesForAlternative1: 0,
-                    votesForAlternative2: 0,
-                    requestingToAddVotesToPoll: false,
-                    requestingTimeRemaining: true,
-                    requestingNumberOfVotes: false
+                    pollId: pollId
                 });
 //                timer = setInterval(sendMessage, 1000, message);
                 stompClient.send("/app/polls/connections/" + pollId + "/timeRemaining", {}, message);
@@ -94,10 +82,7 @@
                     const messageToSend = JSON.stringify({
                         pollId: pollId,
                         votesForAlternative1: parsedMessage.votesForAlternative1,
-                        votesForAlternative2: parsedMessage.votesForAlternative2,
-                        requestingToAddVotesToPoll: true,
-                        requestingTimeRemaining: false,
-                        requestingNumberOfVotes: false
+                        votesForAlternative2: parsedMessage.votesForAlternative2
                     });
                     stompClient.send("/app/polls/connections/" + pollId + "/votes", {}, messageToSend);
                 } catch (e) {
@@ -112,36 +97,9 @@
             console.log("Attempting to get votes on poll with id: " + pollId);
             if (stompClient != null) {
                 const messageToSend = JSON.stringify({
-                    pollId: pollId,
-                    votesForAlternative1: 0,
-                    votesForAlternative2: 0,
-                    requestingToAddVotesToPoll: false,
-                    requestingTimeRemaining: false,
-                    requestingNumberOfVotes: true
+                    pollId: pollId
                 });
                 stompClient.send("/app/polls/connections/" + pollId + "/currentVotes", {}, messageToSend);
-            } else {
-                console.log("Connection to server has already been terminated!");
-            }
-        }
-
-        function sendMessage(message) {
-            console.log("Attempting to send a message to the server");
-            if (stompClient != null) {
-                try {
-                    const parsedMessage = JSON.parse(message);
-                    const messageToSend = JSON.stringify({
-                        pollId: pollId,
-                        votesForAlternative1: parsedMessage.votesForAlternative1,
-                        votesForAlternative2: parsedMessage.votesForAlternative2,
-                        requestingToAddVotesToPoll: parsedMessage.requestingToAddVotesToPoll,
-                        requestingTimeRemaining: parsedMessage.requestingTimeRemaining,
-                        requestingNumberOfVotes: parsedMessage.requestingNumberOfVotes
-                    });
-                    stompClient.send("/app/polls/connections/" + pollId, {}, messageToSend);
-                } catch (e) {
-                    console.log("Something went wrong interpreting message: " + message);
-                }
             } else {
                 console.log("Connection to server has already been terminated!");
             }
@@ -150,6 +108,8 @@
     </script>
 </head>
 <body onload="disconnect()">
+
+<header>Use developer console to interact with websocket</header>
 
 </body>
 </html>

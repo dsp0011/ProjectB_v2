@@ -540,6 +540,7 @@ public class Controller {
 		if (!pollExistsInDatabase(poll)) {
 			return null;
 		}
+		// TODO: check that user has not already voted on this poll.
 		Vote newVote = poll.getVote();
 		newVote.setAlternative1(newVote.getAlternative1() + vote.getAlternative1());
 		newVote.setAlternative2(newVote.getAlternative2() + vote.getAlternative2());
@@ -551,37 +552,6 @@ public class Controller {
 	/*
 			WEBSOCKET REQUESTS
 	*/
-
-	@MessageMapping("/polls/connections/{pollId}")
-	@SendTo("/topic/pollWithId_{pollId}")
-	public OutputMessage receive(InputMessage message) {
-		log.info("Got a message from an IoT device");
-		if (message.isRequestingToAddVotesToPoll()) {
-			try {
-				return addVotesToExistingPoll(message);
-			} catch (Exception e) {
-				log.info("Something went wrong trying to add votes to existing poll");
-				return createOutputErrorMessage("Failed to add votes to poll");
-			}
-		} else if (message.isRequestingTimeRemaining()) {
-			try {
-				return pollsTimeRemaining(message);
-			} catch (Exception e) {
-				log.info("Something went wrong. Failed to calculate the time remaining");
-				return createOutputErrorMessage("Failed to get time remaining for poll");
-			}
-		} else if (message.isRequestingNumberOfVotes()) {
-			try {
-				return getVotesFromPoll(message);
-			} catch (Exception e) {
-				log.info("Something went wrong. Failed to get votes from the poll");
-				return createOutputErrorMessage("Failed to retrieve votes from poll");
-			}
-		} else {
-			log.info("Did nothing with the message");
-			return createOutputErrorMessage("Something went wrong. Did nothing with the message");
-		}
-	}
 
 	@MessageMapping("/polls/connections/{pollId}/timeRemaining")
 	@SendTo("/topic/pollWithId_{pollId}/timeRemaining")
@@ -629,7 +599,7 @@ public class Controller {
 			return createOutputErrorMessage("Failed to add votes to poll");
 		}
 		log.info("Successfully added the votes to the poll");
-		return createVotesOnPollOutputMessage(poll.getVote()); //createValidVoteOutputMessage(message);
+		return createVotesOnPollOutputMessage(poll.getVote());
 	}
 
 	@NotNull
@@ -686,16 +656,6 @@ public class Controller {
 				new OutputErrorMessage(message);
 		errorMessage.setTime(time);
 		return errorMessage;
-	}
-
-	@NotNull
-	private ValidVoteOutputMessage createValidVoteOutputMessage(InputMessage message) {
-		String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
-		ValidVoteOutputMessage outputMessage = new ValidVoteOutputMessage(message.getPollId(),
-				message.getVotesForAlternative1(),
-				message.getVotesForAlternative2());
-		outputMessage.setTime(time);
-		return outputMessage;
 	}
 
 	private boolean pollExistsInDatabase(Poll poll) {
