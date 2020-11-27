@@ -109,7 +109,15 @@
 </head>
 <body onload="disconnect()">
 
-<header>Use developer console to interact with websocket</header>
+<h2>Use developer console to interact with websocket</h2>
+<h3>Commands:</h3>
+<p>connect(pollID, subscribeToTimeRemainingUpdates, subscribeToVoteUpdates)<br>
+Examples: connect(2), connect(2, true, false), connect(9, false, false).
+</p>
+<p>disconnect()</p>
+<p>getTimeRemaining()</p>
+<p>getVotesForPoll()</p>
+<p>addVotesForPoll('{ "votesForAlternative1" : 1, "votesForAlternative2" : 2}')</p>
 
 </body>
 </html>
