@@ -26,8 +26,10 @@
             stompClient.connect({}, function () {
                 console.log("Opened a new connection to the server");
                 const channel = "/topic/pollWithId_" + pollId;
+                stompClient.subscribe(channel, function (messageOutput) {});
+                console.log("Now subscribed to main channel");
                 if (timeUpdates === false && voteUpdates === false) {
-                    console.log("Not subscribed to any channel");
+                    console.log("Not subscribed to any additional channel");
                 } else {
                     if (timeUpdates === true) {
                         const channelForTimeUpdates = channel + "/timeRemaining";
@@ -43,6 +45,7 @@
                     }
                 }
             });
+            setTimeout(checkIfValidPollId, 1000);
         }
 
         function disconnect() {
@@ -52,6 +55,17 @@
                 stompClient.unsubscribe();
                 stompClient.disconnect();
                 stompClient = null;
+            }
+        }
+
+        function checkIfValidPollId() {
+            if (stompClient != null) {
+                const message = JSON.stringify({
+                    pollId: pollId
+                });
+                stompClient.send("/app/polls/connections/" + pollId + "/existing", {}, message);
+            } else {
+                console.log("Connection to server has already been terminated!");
             }
         }
 
@@ -137,7 +151,7 @@
 <h2>Use developer console to interact with websocket</h2>
 <h3>Commands:</h3>
 <p>connect(pollID, subscribeToTimeRemainingUpdates, subscribeToVoteUpdates)<br>
-Examples: connect(2), connect(2, true, false), connect(9, false, false).
+    Examples: connect(2), connect(2, true, false), connect(9, false, false).
 </p>
 <p>disconnect()</p>
 <p>getTimeRemaining()</p>

@@ -589,6 +589,31 @@ public class Controller {
 			WEBSOCKET REQUESTS
 	*/
 
+	@MessageMapping("/polls/connections/{pollId}/existing")
+	@SendTo({"/topic/pollWithId_{pollId}"})
+	public OutputMessage receiveCheckIfPollIdIsValidRequest(InputMessage message) {
+		log.info("Received WebSocket request to check if connected to a valid pollId");
+		try {
+			Poll poll = pollRepository.findById(message.getPollId());
+			if (!pollExistsInDatabase(poll)) {
+				return createOutputErrorMessage("Not connected to a valid poll ID");
+			}
+			return createValidPollIdOutputMessage();
+		} catch (Exception e) {
+			log.info("Something went wrong. Failed to check pollId");
+			return createOutputErrorMessage("Failed to check if poll ID was valid");
+		}
+	}
+
+	private OutputMessage createValidPollIdOutputMessage() {
+		String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
+		validPollIdOutputMessage validPollIdOutputMessage =
+				new validPollIdOutputMessage("Connected to a valid PollId");
+		validPollIdOutputMessage.setTime(time);
+		return validPollIdOutputMessage;
+	}
+
+
 	@MessageMapping("/polls/connections/{pollId}/timeRemaining")
 	@SendTo("/topic/pollWithId_{pollId}/timeRemaining")
 	public OutputMessage receiveTimeRemainingRequest(InputMessage message) {
