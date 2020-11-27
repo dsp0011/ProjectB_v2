@@ -12,7 +12,8 @@
 
         let stompClient = null;
         let pollId = null;
-        let timer = null;
+        let timeRemainingTimer = null;
+        let updateVoteCountTimer = null;
 
         function connect(newPollId, timeUpdates = true, voteUpdates = true) {
             if (stompClient != null) {
@@ -60,17 +61,41 @@
                 const message = JSON.stringify({
                     pollId: pollId
                 });
-//                timer = setInterval(sendMessage, 1000, message);
                 stompClient.send("/app/polls/connections/" + pollId + "/timeRemaining", {}, message);
             } else {
                 console.log("Connection to server has already been terminated!");
             }
         }
 
-        function stopGetTimeRemaining() {
-            if (timer != null) {
+        function startGetTimeRemainingEverySecond() {
+            if (stompClient != null) {
+                console.log("Starting to send repeated time remaining requests");
+                timeRemainingTimer = setInterval(getTimeRemaining, 1000);
+            } else {
+                console.log("Connection to server has already been terminated!");
+            }
+        }
+
+        function stopGetTimeRemainingEverySecond() {
+            if (timeRemainingTimer != null) {
                 console.log("Stopping time remaining requests");
-                clearInterval(timer);
+                clearInterval(timeRemainingTimer);
+            }
+        }
+
+        function startUpdatingVoteCounterEveryTenSeconds() {
+            if (stompClient != null) {
+                console.log("Starting to send repeated vote update requests");
+                updateVoteCountTimer = setInterval(getVotesForPoll, 10000);
+            } else {
+                console.log("Connection to server has already been terminated!");
+            }
+        }
+
+        function stopUpdatingVoteCounterEveryTenSeconds() {
+            if (updateVoteCountTimer != null) {
+                console.log("Stopping vote update requests");
+                clearInterval(updateVoteCountTimer);
             }
         }
 
