@@ -18,6 +18,11 @@
 		<java.version>11</java.version>
 	</properties>
 
+	<configuration>
+		<processTypes>
+			<web>npm start --prefix web/web-app</web>
+		</processTypes>
+	</configuration>
 
 	<dependencies>
 		<dependency>
