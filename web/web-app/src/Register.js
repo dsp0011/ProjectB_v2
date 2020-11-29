@@ -15,7 +15,7 @@ class Register extends Component {
 
         xhr.addEventListener('load', () => {
         })
-        xhr.open('POST', 'http://localhost:8080/users')
+        xhr.open('POST', 'https://stormy-ocean-39096.herokuapp.com/users')
         xhr.setRequestHeader('Content-Type', 'application/json');
 
         const jsonString = JSON.stringify( {

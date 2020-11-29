@@ -25,7 +25,7 @@ class Login extends Component {
             }
             
         })
-        const URL = 'http://localhost:8080/users/' + username
+        const URL = 'https://stormy-ocean-39096.herokuapp.com/users/' + username
 
         xhr.open('GET', URL)
         xhr.send(URL)

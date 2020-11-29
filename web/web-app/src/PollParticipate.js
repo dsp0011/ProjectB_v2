@@ -21,7 +21,7 @@ class PollParticipate extends Component {
   
     sendVoteUpdate = (alternative) => {
         const xhr = new XMLHttpRequest()
-        const URL = 'http://localhost:8080/votes/' + this.props.match.params.pollID
+        const URL = 'https://stormy-ocean-39096.herokuapp.com/votes/' + this.props.match.params.pollID
 
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
@@ -40,7 +40,7 @@ class PollParticipate extends Component {
         const xhr = new XMLHttpRequest()
         const pollData = this.state.poll
         pollData.public = this.state.public
-        const URL = 'http://localhost:8080/users/participatePoll/' + getSessionCookie().username
+        const URL = 'https://stormy-ocean-39096.herokuapp.com/users/participatePoll/' + getSessionCookie().username
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Content-Type', 'application/json');
         //create JSON string request
@@ -85,7 +85,7 @@ class PollParticipate extends Component {
                         pollID : jsonResponse["id"]
                     })
         })
-        const URL = 'http://localhost:8080/polls/' + pollID
+        const URL = 'https://stormy-ocean-39096.herokuapp.com/polls/' + pollID
 
         xhr.open('GET', URL)
         // send the request

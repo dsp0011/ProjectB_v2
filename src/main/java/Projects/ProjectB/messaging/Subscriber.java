@@ -33,6 +33,6 @@ public class Subscriber {
         log.info("Result message received");
 
         Poll poll = (Poll) message.getPayload();
-        mongoTemplate.insert(poll, "poll");
+        mongoTemplate.insert(poll, "Polls");
     }
 }

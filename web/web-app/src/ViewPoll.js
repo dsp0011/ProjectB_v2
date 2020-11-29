@@ -89,7 +89,7 @@ class ViewPoll extends Component {
                 
             
         })
-        const URL = 'http://localhost:8080/polls/' + pollID
+        const URL = 'https://stormy-ocean-39096.herokuapp.com/polls/' + pollID
 
         xhr.open('GET', URL)
         xhr.send(URL)

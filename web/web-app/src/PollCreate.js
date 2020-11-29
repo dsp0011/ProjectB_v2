@@ -28,7 +28,7 @@ class PollCreate extends Component {
     addUserCreatedPoll = () => {
         const xhr = new XMLHttpRequest()
         const pollData = this.makePollJSON()
-        const URL = 'http://localhost:8080/users/createPoll/' + getSessionCookie().username
+        const URL = 'https://stormy-ocean-39096.herokuapp.com/users/createPoll/' + getSessionCookie().username
         
         xhr.open('PUT', URL)
         xhr.setRequestHeader('Content-type', 'application/json')
@@ -63,7 +63,7 @@ class PollCreate extends Component {
         const xhr = new XMLHttpRequest()
 
         const pollData = this.makePollJSON()
-        const URL = 'http://localhost:8080/polls/'
+        const URL = 'https://stormy-ocean-39096.herokuapp.com/polls/'
         xhr.open('POST', URL)
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
         xhr.setRequestHeader('Content-Type', 'application/json');

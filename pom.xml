@@ -15,14 +15,8 @@
 	<description>ProjectB</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>8</java.version>
 	</properties>
-
-	<configuration>
-		<processTypes>
-			<web>npm start --prefix web/web-app</web>
-		</processTypes>
-	</configuration>
 
 	<dependencies>
 		<dependency>
@@ -151,7 +145,13 @@
 				<groupId>com.heroku.sdk</groupId>
 				<artifactId>heroku-maven-plugin</artifactId>
 				<version>3.0.3</version>
+				<configuration>
+					<processTypes>
+						<web>npm start</web>
+					</processTypes>
+				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
