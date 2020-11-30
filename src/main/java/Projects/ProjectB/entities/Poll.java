@@ -110,11 +110,14 @@ public class Poll {
      * @return The time left before the poll closes as time units or "inf".
      */
     public String computeTimeRemaining() {
-        if (pollClosingDate.toLowerCase().equals("inf")) {
-            return "inf";
-        }
         if (!canEdit && !isActive) {
             return "Poll is closed";
+        } else if (canEdit) {
+            return "Poll has yet to be published";
+        }
+
+        if (pollClosingDate.toLowerCase().equals("inf")) {
+            return "inf";
         }
         ZonedDateTime closingDate = ZonedDateTime.parse(pollClosingDate);
         ZonedDateTime now = ZonedDateTime.now();
