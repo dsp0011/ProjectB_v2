@@ -210,7 +210,6 @@ public class Controller {
 				return "Anonymous participant";
 			} else {
 				participant.addPollVotedOn(poll);
-				participant.votedOnANewPoll(poll);
 				userRepository.save(participant);
 				log.info("Successfully registered the poll with ID: " + pollID
 						+ ", as voted on by user with ID: " + participant.getId());
@@ -312,8 +311,7 @@ public class Controller {
 
     private void removeUsersConnectionToCreatedPolls(User user) {
 	    // Removes foreign key constraints.
-        for (long pollId : user.getIdsOfPollsCreated()) {
-            Poll poll = pollRepository.findById(pollId);
+        for (Poll poll : user.getPollsCreated()) {
         	poll.setCreator(null);
         }
     }
@@ -340,7 +338,7 @@ public class Controller {
 			Poll poll = new Poll(question, alternative1, alternative2,
 					timeLimit, isPublic, false, true, creator);
 			pollRepository.save(poll);
-			creator.createdANewPoll(poll);
+			creator.addPollCreated(poll);
 			userRepository.save(creator);
 			log.info("Poll was created successfully");
 			return Long.toString(poll.getId());
