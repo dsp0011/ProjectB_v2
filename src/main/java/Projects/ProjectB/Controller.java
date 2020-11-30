@@ -594,18 +594,24 @@ public class Controller {
 			Poll poll = pollRepository.findById(message.getPollId());
 			if (!pollExistsInDatabase(poll)) {
 				return createOutputErrorMessage("Not connected to a valid poll ID");
+			} else if (!poll.isActive() && !poll.isCanEdit()) {
+				return createValidPollIdOutputMessage("Connected poll ID belongs to a closed poll");
+			} else if (poll.isCanEdit()) {
+				return createValidPollIdOutputMessage("Connected poll ID belongs to a poll " +
+						"that has yet to be published");
+			} else {
+				return createValidPollIdOutputMessage("Connected to an ongoing Poll");
 			}
-			return createValidPollIdOutputMessage();
 		} catch (Exception e) {
 			log.info("Something went wrong. Failed to check pollId");
 			return createOutputErrorMessage("Failed to check if poll ID was valid");
 		}
 	}
 
-	private OutputMessage createValidPollIdOutputMessage() {
+	private OutputMessage createValidPollIdOutputMessage(String message) {
 		String time = new SimpleDateFormat("HH:mm:ss").format(new Date());
 		validPollIdOutputMessage validPollIdOutputMessage =
-				new validPollIdOutputMessage("Connected to a valid PollId");
+				new validPollIdOutputMessage(message);
 		validPollIdOutputMessage.setTime(time);
 		return validPollIdOutputMessage;
 	}
