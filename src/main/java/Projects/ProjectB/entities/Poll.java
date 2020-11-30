@@ -113,6 +113,9 @@ public class Poll {
         if (pollClosingDate.toLowerCase().equals("inf")) {
             return "inf";
         }
+        if (!canEdit && !isActive) {
+            return "Poll is closed";
+        }
         ZonedDateTime closingDate = ZonedDateTime.parse(pollClosingDate);
         ZonedDateTime now = ZonedDateTime.now();
         long seconds = ChronoUnit.SECONDS.between(now, closingDate);
