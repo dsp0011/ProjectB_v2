@@ -159,7 +159,7 @@ public class Controller {
 		return userRepository.findByUserName(userName);
 	}
 
-
+//
 	@PutMapping("/users/createPoll/{userName}")
 	public String updateUserPollsCreated(@PathVariable String userName, @RequestBody Map<String, String> json) {
 //		String question = "" + json.get("question");
@@ -175,24 +175,25 @@ public class Controller {
 //
 //		creator.addPollCreated(poll);
 //		userRepository.save(creator);
+		System.out.println("Called create poll");
 		return "";
 
 	}
 	@PutMapping("/users/edit/{userName}")
 	public String updateUserPollsEdited(@PathVariable String userName, @RequestBody Map<String, String> json) {
+		System.out.println("Called edit");
 		int pollID = Integer.parseInt(json.get("pollID"));
 		String creatorUserName = "" + json.get("creator");
 		User creator = userRepository.findByUserName(creatorUserName);
 		Poll poll = pollRepository.findById(pollID);
 
-
-		creator.addPollVotedOn(poll);
+		poll.updateUsersVoted(creator);
 		userRepository.save(creator);
 		return "";
 	}
 
 
-	@PutMapping("/users/participatePoll/{userName}")
+	@PutMapping("/users/participatedPoll/{userName}")
 	public String updateUserPollsParticipated(@PathVariable String userName, @RequestBody Map<String, String> json) {
 		log.info("Attempting to register a users participation on a poll");
 		try {
@@ -209,8 +210,7 @@ public class Controller {
 				log.info("User is anonymous");
 				return "Anonymous participant";
 			} else {
-				participant.addPollVotedOn(poll);
-				//participant.votedOnANewPoll(poll);
+				poll.updateUsersVoted(participant);
 				userRepository.save(participant);
 				log.info("Successfully registered the poll with ID: " + pollID
 						+ ", as voted on by user with ID: " + participant.getId());
@@ -312,18 +312,9 @@ public class Controller {
 
     private void removeUsersConnectionToCreatedPolls(User user) {
 	    // Removes foreign key constraints.
-		for (Poll poll : user.getPollsCreated()) {
+		for (Poll poll : pollRepository.findByCreator(user)) {
 			poll.setCreator(null);
 		}
-
-
-/*
-        for (long pollId : user.getIdsOfPollsCreated()) {
-            Poll poll = pollRepository.findById(pollId);
-        	poll.setCreator(null);
-        }
-
- */
     }
 
 /*
@@ -348,9 +339,6 @@ public class Controller {
 			Poll poll = new Poll(question, alternative1, alternative2,
 					timeLimit, isPublic, false, true, creator);
 			pollRepository.save(poll);
-			creator.addPollCreated(poll);
-			//	creator.createdANewPoll(poll);
-			userRepository.save(creator);
 			log.info("Poll was created successfully");
 			return Long.toString(poll.getId());
 		}

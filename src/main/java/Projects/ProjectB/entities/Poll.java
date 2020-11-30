@@ -173,10 +173,6 @@ public class Poll {
         );
     }
 
-    public List<User> getUsersVoted() {
-        return usersVoted;
-    }
-
     public void updateUsersVoted(User user) {
         if (this.usersVoted == null) {
             this.usersVoted = new ArrayList<>();
@@ -184,9 +180,5 @@ public class Poll {
         } else {
             this.usersVoted.add(user);
         }
-    }
-
-    public void setUsersVoted(List<User> usersVoted) {
-        this.usersVoted = usersVoted;
     }
 }
